@@ -3,8 +3,6 @@
 import sys
 import numpy as np
 import re
-from utilities import   decimal,real_sn,r_or_d,AngToAu
-
 
 class Pwscf:
 
@@ -12,13 +10,18 @@ class Pwscf:
         self.control    = {}
         self.system     = {}
         self.electrons  = {}
-        self._kpoints    = []
-        self._atoms      = {}
-        self._forces     = {}
-        self._atoms_positions = []
-        self._cell_parameters = []
+        self.atypes      = {}
+        self.atoms       = []
+        self.cell_parameters = []
+
+        self.ktype = "automatic"
+        self.kpoints = [1,1,1]
+        self.shiftk = [0,0,0]
+        self.klist = []
+
         self.set_pwscf_default()
-        if filename != None:
+
+        if filename:
             self.read(filename)
 
 
@@ -50,9 +53,8 @@ class Pwscf:
         self.electrons['conv_thr']        = float(1E-7)
         self._kpoints           = [0,0,0,0,0,0]
 
-    def _read_word(self, value):
-        value=value.strip().strip(',')
-        return value
+        self.cell_units      = 'bohr'
+        self.atomic_pos_type = 'bohr'
 
     def write(self,filename):
         f = open(filename,'w')
@@ -70,184 +72,147 @@ class Pwscf:
 
 
     def __str__(self):
+
         string=''
-## Control section
         string += self.stringify_group("control",self.control)
         string += self.stringify_group("system",self.system)
         string += self.stringify_group("electrons",self.electrons)
 
-## CELL_PARAMETERS section
-        if len(self._cell_parameters)!=0:
-           string += "CELL_PARAMETERS {bohr}\n"
-#           for vec in self._cell_parameters:
-#               self._write_word(string, None, vec[0:3])
+        if int(self.system['ibrav']) == 0:
+            string += self.write_cell_parameters()
 
-## ATOMIC SPECIES section
-        string += "ATOMIC_SPECIES\n"
-#        for word in self._atoms:
-#            self._write_word(string, word, self._atoms[word])
-
-## ATOMIC_POSITIONS section
-        string += "ATOMIC_POSITIONS {bohr}\n"
-        print("Warning: ATOMIC_POSITIONS are going to be written in bohr")
-        for atom in self._atoms_positions:
-            string += str(atom[0])+" "+str(atom[1][0])+" "+str(atom[1][1])+" "+str(atom[1][2])+"\n"
-
-## KPOINTS section
-        string += "K_POINTS automatic\n"
-        for ik in self._kpoints:
-            string += str(ik)+""
-##
+        string += self.write_atomicspecies()
+        string += self.write_atoms()
+        string += self.write_kpoints()
         return string
 
-    def _write_line(self,string, values):
-        for value in values:
-            string += "5%"+str(values)+"%5s"
-        string += "\n"
 
+    def read_atomicspecies(self):
+        lines = iter(self.file_lines)
+        for line in lines:
+            if "ATOMIC_SPECIES" in line:
+                for i in range(int(self.system["ntyp"])):
+                    atype, mass, psp = next(lines).split()
+                    self.atypes[atype] = [mass,psp]
 
+    def write_atomicspecies(self):
+        string = "ATOMIC_SPECIES\n"
+        for atype in self.atypes:
+            string += " %3s %8s %20s\n" % (atype, self.atypes[atype][0], self.atypes[atype][1])
+        return string
+
+    def read_atoms(self):
+        lines = iter(self.file_lines)
+        atomicp_pattern=r'\s*ATOMIC_POSITIONS\s*\{?\s*(\w*)\s*\}?'
+        for line in lines:
+            if re.search(atomicp_pattern, line):
+                match = re.search(atomicp_pattern, line)
+                self.atomic_pos_type = match.group(1)
+                for i in range(int(self.system["nat"])):
+                    atype, x,y,z = next(lines).split()
+                    self.atoms.append([atype,[float(i) for i in x,y,z]])
+
+    def write_atoms(self):
+        string = "ATOMIC_POSITIONS { %s }\n"%self.atomic_pos_type
+        for atom in self.atoms:
+            string += "%3s %14.10lf %14.10lf %14.10lf\n" % (atom[0], atom[1][0], atom[1][1], atom[1][2])
+        return string
+
+    def read_cell_parameters(self):
+        cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
+        self.cell_parameters = [[1,0,0],[0,1,0],[0,0,1]]
+        ibrav = int(self.system['ibrav'])
+        if ibrav == 0:
+            if 'celldm(1)' in self.system.keys():
+                a = float(self.system['celldm(1)'])
+            else:
+                a = 1
+            lines = iter(self.file_lines)
+            for line in lines:
+                if re.search(cellp_pattern, line):
+                    match = re.search(cellp_pattern, line)
+                    self.cell_units = match.group(1)
+                    for i in range(3):
+                        self.cell_parameters[i] = [ float(x)*a for x in lines.next().split() ]
+        elif ibrav == 4:
+            a = float(self.system['celldm(1)'])
+            c = float(self.system['celldm(3)'])
+            self.cell_parameters = [[   a,          0,  0],
+                                    [-a/2,sqrt(3)/2*a,  0],
+                                    [   0,          0,c*a]]
+        elif ibrav == 2:
+            a = float(self.system['celldm(1)'])
+            self.cell_parameters = [[ -a/2,   0, a/2],
+                                    [    0, a/2, a/2],
+                                    [ -a/2, a/2,   0]]
+        else:
+            print 'ibrav = %d not implemented'%ibrav
+            exit(1)
+
+    def write_cell_parameters(self):
+        string = "CELL_PARAMETERS { %s }\n"%self.cell_units
+        for i in range(3):
+            string += ("%14.10lf "*3+"\n")%tuple(self.cell_parameters[i])
+        return string
+
+    def read_namelist(self,group):
+        for line in self.file_lines:
+            if "="  not in line:
+                continue
+            key, value=line.split("=")
+            for keyword in group:
+                if key.strip().lower() == keyword:
+                    group[keyword] = value.strip().strip(',')
 
     def read(self, filename):
         ifile = open(filename,'r')
-        cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
-        lines=ifile.readlines()
-        for i, line in enumerate(lines):
-            if re.search(cellp_pattern, line):
-                match = re.search(cellp_pattern, line)
-                cell_units = match.group(1)
+        self.file_lines=ifile.readlines()
 
-                if cell_units == "bohr":
-                    scale=1.0
-                elif cell_units == "angstrom":
-                    scale=AngToAu
-                elif cell_units == "alat":
-                    scale=float(self.system['celldm(1)'])
-                
-                for line in lines[i+1:i+4]:
-                    cell_vectors = line.split()
-                    vec=np.asarray(cell_vectors[0:3], dtype=np.float)*scale
-                    self._cell_parameters.append(vec.tolist())
+        self.read_namelist(self.control)
+        self.read_namelist(self.system)
+        self.read_namelist(self.electrons)
 
-            if "ATOMIC_SPECIES" in line:
-                for line in lines[i+1:i+1+int(self.system['ntyp'])]:
-                    info_atoms = line.split()
-                    self._atoms[info_atoms[0]] = info_atoms[1:]
+        self.read_cell_parameters()
+        self.read_atomicspecies()
+        self.read_atoms()
+        self.read_kpoints()
 
-            atomicp_pattern=r'\s*ATOMIC_POSITIONS\s*\{?\s*(\w*)\s*\}?'
-            if re.search(atomicp_pattern, line):
-                match = re.search(atomicp_pattern, line)
-                pos_units = match.group(1)
-                self._atoms_positions = [[],np.zeros((int(self.system['nat']),3),dtype=float)]
-                
-                for ia in range(int(self.system['nat'])):
-                    info_atoms_pos = lines[i+1+ia].split()
-                    self._atoms_positions[ia] = [info_atoms_pos[0],info_atoms_pos[1:4]]
-
-                self._convert_to_bohr(pos_units)
-
-            if "K_POINTS" in line:
-                self._kpoints = lines[i+1]
-            if "="  not in line:
-                continue
-            flag, value=line.split("=")
-            for word in self.control:
-                if flag.strip().lower() == word:
-                    self.control[word] = self._read_word(value)
-            for word in self.electrons:
-                if flag.strip().lower() == word:
-                    self.electrons[word] = self._read_word(value)
-            for word in self.system:
-                if flag.strip().lower() == word:
-                    self.system[word] = self._read_word(value)
         ifile.close()
-#
-    def read_qe_output(self,ofile):
-        lines=ofile.read()
-        pattern_nelec=r'number'+'\s'+'of'+'\s'+'electrons'+'\s+'+'='+'\s+(\d\.\d*)'
-        try:
-            match = re.search(pattern_nelec, lines)
-            nelec = match.group(1)
-        except:
-            print("Error in matching number of electrons")
-        nbnd = int(0.5*float(nelec))
-        ofile.seek(0)
-        lines=ofile.readlines()
-        pattern_egap='k = 0.0000 0.0000 0.0000'
-        for i, line in enumerate(lines):
-            if pattern_egap in line:
-              info_gap = lines[i+2].split()
-              top_val = float(info_gap[nbnd-1])
-              bot_cond = float(info_gap[nbnd])
-              egap = (bot_cond-top_val)/27.2114
-        return nelec, nbnd, egap
-        
-        #for line in lines:
-        #    if "Forces" in line:
-        #        for line in lines[i+2:i+2+int(self.system['ntyp'])]:
-        #            info_force_atoms = line.split()
-        #            print(info_force_atoms[1], info_force_atoms[6:])
-        #            self._forces[info_force_atoms[1]] = info_force_atoms[6:]
-        #    if "Total force =" in line:
-        #            info_total_force = line.split()
-        #            Total_Force = info_total_force[3]
-        #            print("Total Force = "+str(Total_Force))
-        #    if "!    total" in line:
-        #            info_total_energy = line.split()
-        #            Total_Energy = info_total_energy[4]
-        #            print("Total Energy = "+str(Total_Energy))
 
-    def _convert_to_bohr(self, units):
-        if units == "bohr":
-            return
-        elif units == "angstrom":
-            self._rescale_pos(AngToAu)
-        elif units == "alat":
-            self._rescale_pos(float(self.system['celldm(1)']))
-        elif units == "crystal":
-            vec = np.zeros((3,3),dtype=float);    i=0
-            atom_pos=         np.zeros((int(self.system['nat']),3), dtype=float)
-            atom_pos_bohr=[[],np.zeros((int(self.system['nat']),3), dtype=float)]
-            for cp in self._cell_parameters:
-                vec[i,:]= np.asarray(cp[:], dtype=np.float) #in **Bohr**
-                i=i+1
-            for ia in range(int(self.system['nat'])):
-                atom_pos[ia,:] = np.asarray(self._atoms_positions[ia][1:4], dtype=np.float)
-                atom_pos_bohr[ia] = [self._atoms_positions[ia][0],np.dot(vec,atom_pos[ia]).tolist()]
-                self._atoms_positions[ia]=atom_pos_bohr[ia]
+    def read_kpoints(self):
+        lines = iter(self.file_lines)
+        #find K_POINTS keyword in file and read next line
+        for line in lines:
+            if "K_POINTS" in line:
+                #chack if the type is automatic
+                if "automatic" in line.lower():
+                    self.ktype = "automatic"
+                    vals = map(float, lines.next().split())
+                    self.kpoints, self.shiftk = vals[0:3], vals[3:6]
+                #otherwise read a list
+                elif "gamma" in line.lower():
+                    self.ktype = "gamma"
+                else:
+                    #read number of kpoints
+                    nkpoints = int(lines.next().split()[0])
+                    self.klist = []
+                    self.ktype = ""
+                    try:
+                        lines_list = list(lines)
+                        for n in range(nkpoints):
+                            vals = lines_list[n].split()[:4]
+                            self.klist.append( map(float,vals) )
+                    except IndexError:
+                        print "wrong k-points list format"
+                        exit(1)
 
-    def get_cell_parameters(self):
-        cell = np.zeros((3,3),dtype=float)
-        for cp in self._cell_parameters:
-                cell[i,:]= np.asarray(cp[:], dtype=np.float)
-
-    def _rescale_pos(self, scale):
-        for ia in range(int(self.system['nat'])):
-            self._atoms_positions[ia][1:4]=scale*np.asarray(self._atoms_positions[ia][1:4], dtype=np.float)
-
-    def get_starting_positions(self):
-        start_atom_pos= [[],np.zeros((int(self.system['nat']),3), dtype=float)]
-        for ia in range(int(self.system['nat'])):
-            start_atom_pos[ia] = self._atoms_positions[ia]
-        return start_atom_pos
-
-    def set_positions(self,positions):
-        if isinstance(positions, np.ndarray):
-            for ia in range(int(self.system['nat'])):
-                self._atoms_positions[ia][1:4]=positions[ia]
-        else:
-            print('passo qui')
-            self._atoms_positions = positions
-
-
-# Recently assigned and default values can be shown thanks to the 
-# following function
-#
-    def show_values(self):
-        for word in self.control:
-            print (word+"="+str(self.control[word]))
-        for word in self.system:
-            print (word+"="+str(self.system[word]))
-        for word in self.electrons:
-            print (word+"="+str(self.electrons[word]))
-
+    def write_kpoints(self):
+        string = "K_POINTS { %s }\n"%self.ktype
+        if self.ktype == "automatic":
+            string += ("%3d"*6+"\n")%tuple(self.kpoints + self.shiftk)
+        elif self.ktype == "crystal" or self.ktype == "tpiba" :
+            string += "%d\n" % len(self.klist)
+            for i in self.klist:
+              string += ('%12.8lf '*4+'\n') % tuple(i)
+        return string
 
