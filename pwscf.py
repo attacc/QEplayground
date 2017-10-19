@@ -3,159 +3,112 @@
 import sys
 import numpy as np
 import re
-
-class PwscfIn:
-
-#
-#   Useful regular expression for QE
-#
-    decimal=r'-?\d+\.\d*|-?\.\d+'
-    real_sn=r'[+\-]?\d*\.\d*[E][+\-]\d\d?'
-    r_or_d =r'('+real_sn + '|' + decimal + ')'
-
-#
-#   Units
-# 
-    AngToAu=1.8897261
+from utilities import   decimal,real_sn,r_or_d,AngToAu
 
 
-    def __init__(self):
-        self._control    = {}
-        self._system     = {}
-        self._electrons  = {}
+class Pwscf:
+
+    def __init__(self, filename=None):
+        self.control    = {}
+        self.system     = {}
+        self.electrons  = {}
         self._kpoints    = []
         self._atoms      = {}
         self._forces     = {}
         self._atoms_positions = []
         self._cell_parameters = []
         self.set_pwscf_default()
+        if filename != None:
+            self.read(filename)
+
 
     def __del__(self):
         print("Destroy class PwscfIn")
 
     def set_pwscf_default(self):
-        self._control['calculation']  = 'scf'
-        #self._control['restart_mode'] = 'from_scratch'
-        self._control['prefix']       = 'test'
-        self._control['pseudo_dir']   = './'
-        #self._control['outdir']       = './'
-        self._control['wf_collect']   = True
-        #self._control['tprnfor']      = True
+        self.control['calculation']  = 'scf'
+        self.control['restart_mode'] = None
+        self.control['prefix']       = 'test'
+        self.control['pseudo_dir']   = './'
+        self.control['outdir']       = '\'./\''
+        self.control['wf_collect']   = None
+        self.control['tprnfor']      = None
 
-        self._system['ibrav']        = None
-        self._system['celldm(1)']    = None
-        self._system['celldm(2)']    = None
-        self._system['celldm(3)']    = None
-        self._system['nat']          = 0
-        self._system['ntyp']         = 0
-        self._system['nbnd']         = None
-        self._system['ecutwfc']      = float(30.0)
-        #self._system['force_symmorphic'] = False
-        self._system['occupations']  = None
+        self.system['ibrav']        = None
+        self.system['celldm(1)']    = None
+        self.system['celldm(2)']    = None
+        self.system['celldm(3)']    = None
+        self.system['nat']          = 0
+        self.system['ntyp']         = 0
+        self.system['nbnd']         = None
+        self.system['ecutwfc']      = float(30.0)
+        self.system['force_symmorphic'] = None
+        self.system['occupations']  = None
 
-        self._electrons['mixing_mode']     = None
-        self._electrons['mixing_beta']     = None
-        self._electrons['conv_thr']        = float(1E-7)
+        self.electrons['mixing_mode']     = None
+        self.electrons['mixing_beta']     = None
+        self.electrons['conv_thr']        = float(1E-7)
         self._kpoints           = [0,0,0,0,0,0]
 
-    def _write_word(self, fout, word, value):
-        if word == None:
-            if isinstance(value, list) and len(value)==1:
-                fout.write("    "+str(value[0])+"\n")
-            if isinstance(value, list) and len(value)==2:
-                fout.write("    "+str(value[0])+"  "+str(value[1])+"\n")
-            elif isinstance(value, list) and len(value)==3:
-                fout.write("    "+str(value[0])+"  "+str(value[1])+"  "+str(value[2])+"\n")
-            return
-
-        if value != None:
-            if value == False:
-                fout.write("    "+word+" "+"="+" "+".false."+",\n")
-            elif value == True:
-                fout.write("    "+word+" "+"="+" "+".true."+",\n")
-            elif isinstance(value, str):
-                 if re.search(r'\d', value):
-                     fout.write("    "+word+" "+"="+" "+str(value)+",\n")
-                 else:
-                     fout.write("    "+word+" = '"+str(value)+"',\n")
-            elif isinstance(value, list) and len(value)==2:
-                fout.write("    "+word+"  "+str(value[0])+"  "+str(value[1])+"\n")
-            elif isinstance(value, list) and len(value)==3:
-                fout.write("    "+word+"  "+str(value[0])+"  "+str(value[1])+"  "+str(value[2])+"\n")
-            else:
-                fout.write("    "+word+" = "+str(value)+",\n")
-
     def _read_word(self, value):
-        value=value.strip().strip(',').strip("'")
-        if value == ".false.":
-            return False
-        elif value == ".true.":
-            return True
-        else:
-            return value
+        value=value.strip().strip(',')
+        return value
 
-    def write_pwscf(self, filename):
+    def write(self,filename):
+        f = open(filename,'w')
+        f.write(str(self))
+        f.close()
 
-        # This is because the file() builtin function is removed in Python 3
-        # 
-        #if isinstance(filename,file):
-        #    print(" passo qui")
-        #    fout=filename
-        #else:
-        try:
-            fout=open(filename,"w")
-        except:
-            print("Error opening %s " % filename)
-            sys.exit(1)
 
+    def stringify_group(self, keyword, group):
+        string='&%s\n' % keyword
+        for keyword in group:
+            if group[keyword] != None:
+                string += "%20s = %s\n" % (keyword, group[keyword])
+        string += "/&end\n"
+        return string
+
+
+    def __str__(self):
+        string=''
 ## Control section
-        fout.write("&control\n")
-        for word in sorted(self._control):
-            self._write_word(fout, word, self._control[word])
-        fout.write("/ \n")
-##
-## System section
-        fout.write("&system\n")
-        for word in sorted(self._system):
-            self._write_word(fout, word, self._system[word])
-        fout.write("/ \n")
-##
-## Electrons section
-        fout.write("&electrons\n")
-        for word in self._electrons:
-            self._write_word(fout, word, self._electrons[word])
-        fout.write("/ \n")
-##
+        string += self.stringify_group("control",self.control)
+        string += self.stringify_group("system",self.system)
+        string += self.stringify_group("electrons",self.electrons)
+
 ## CELL_PARAMETERS section
         if len(self._cell_parameters)!=0:
-           fout.write("CELL_PARAMETERS {bohr}\n")
-           for vec in self._cell_parameters:
-               self._write_word(fout, None, vec[0:3])
-##
+           string += "CELL_PARAMETERS {bohr}\n"
+#           for vec in self._cell_parameters:
+#               self._write_word(string, None, vec[0:3])
+
 ## ATOMIC SPECIES section
-        fout.write("ATOMIC_SPECIES\n")
-        for word in self._atoms:
-            self._write_word(fout, word, self._atoms[word])
-##
+        string += "ATOMIC_SPECIES\n"
+#        for word in self._atoms:
+#            self._write_word(string, word, self._atoms[word])
+
 ## ATOMIC_POSITIONS section
-        fout.write("ATOMIC_POSITIONS {bohr}\n")
+        string += "ATOMIC_POSITIONS {bohr}\n"
         print("Warning: ATOMIC_POSITIONS are going to be written in bohr")
         for atom in self._atoms_positions:
-            fout.write(str(atom[0])+" "+str(atom[1][0])+" "+str(atom[1][1])+" "+str(atom[1][2])+"\n")
-##
-## KPOINTS section
-        fout.write("K_POINTS automatic\n")
-        for ik in self._kpoints:
-            fout.write(str(ik)+"")
-##
-        fout.close()
-#
-# Values coming from QE input file are assigned to the corresponding
-# word in the dictionary. The words in the dictionary are then 
-# eventually re-defined.
-#
+            string += str(atom[0])+" "+str(atom[1][0])+" "+str(atom[1][1])+" "+str(atom[1][2])+"\n"
 
-    def read_qe_input(self, ifile):
+## KPOINTS section
+        string += "K_POINTS automatic\n"
+        for ik in self._kpoints:
+            string += str(ik)+""
+##
+        return string
+
+    def _write_line(self,string, values):
+        for value in values:
+            string += "5%"+str(values)+"%5s"
+        string += "\n"
+
+
+
+    def read(self, filename):
+        ifile = open(filename,'r')
         cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
         lines=ifile.readlines()
         for i, line in enumerate(lines):
@@ -168,7 +121,7 @@ class PwscfIn:
                 elif cell_units == "angstrom":
                     scale=AngToAu
                 elif cell_units == "alat":
-                    scale=float(self._system['celldm(1)'])
+                    scale=float(self.system['celldm(1)'])
                 
                 for line in lines[i+1:i+4]:
                     cell_vectors = line.split()
@@ -176,7 +129,7 @@ class PwscfIn:
                     self._cell_parameters.append(vec.tolist())
 
             if "ATOMIC_SPECIES" in line:
-                for line in lines[i+1:i+1+int(self._system['ntyp'])]:
+                for line in lines[i+1:i+1+int(self.system['ntyp'])]:
                     info_atoms = line.split()
                     self._atoms[info_atoms[0]] = info_atoms[1:]
 
@@ -184,9 +137,9 @@ class PwscfIn:
             if re.search(atomicp_pattern, line):
                 match = re.search(atomicp_pattern, line)
                 pos_units = match.group(1)
-                self._atoms_positions = [[],np.zeros((int(self._system['nat']),3),dtype=float)]
+                self._atoms_positions = [[],np.zeros((int(self.system['nat']),3),dtype=float)]
                 
-                for ia in range(int(self._system['nat'])):
+                for ia in range(int(self.system['nat'])):
                     info_atoms_pos = lines[i+1+ia].split()
                     self._atoms_positions[ia] = [info_atoms_pos[0],info_atoms_pos[1:4]]
 
@@ -197,15 +150,16 @@ class PwscfIn:
             if "="  not in line:
                 continue
             flag, value=line.split("=")
-            for word in self._control:
+            for word in self.control:
                 if flag.strip().lower() == word:
-                    self._control[word] = self._read_word(value)
-            for word in self._electrons:
+                    self.control[word] = self._read_word(value)
+            for word in self.electrons:
                 if flag.strip().lower() == word:
-                    self._electrons[word] = self._read_word(value)
-            for word in self._system:
+                    self.electrons[word] = self._read_word(value)
+            for word in self.system:
                 if flag.strip().lower() == word:
-                    self._system[word] = self._read_word(value)
+                    self.system[word] = self._read_word(value)
+        ifile.close()
 #
     def read_qe_output(self,ofile):
         lines=ofile.read()
@@ -229,7 +183,7 @@ class PwscfIn:
         
         #for line in lines:
         #    if "Forces" in line:
-        #        for line in lines[i+2:i+2+int(self._system['ntyp'])]:
+        #        for line in lines[i+2:i+2+int(self.system['ntyp'])]:
         #            info_force_atoms = line.split()
         #            print(info_force_atoms[1], info_force_atoms[6:])
         #            self._forces[info_force_atoms[1]] = info_force_atoms[6:]
@@ -248,15 +202,15 @@ class PwscfIn:
         elif units == "angstrom":
             self._rescale_pos(AngToAu)
         elif units == "alat":
-            self._rescale_pos(float(self._system['celldm(1)']))
+            self._rescale_pos(float(self.system['celldm(1)']))
         elif units == "crystal":
             vec = np.zeros((3,3),dtype=float);    i=0
-            atom_pos=         np.zeros((int(self._system['nat']),3), dtype=float)
-            atom_pos_bohr=[[],np.zeros((int(self._system['nat']),3), dtype=float)]
+            atom_pos=         np.zeros((int(self.system['nat']),3), dtype=float)
+            atom_pos_bohr=[[],np.zeros((int(self.system['nat']),3), dtype=float)]
             for cp in self._cell_parameters:
                 vec[i,:]= np.asarray(cp[:], dtype=np.float) #in **Bohr**
                 i=i+1
-            for ia in range(int(self._system['nat'])):
+            for ia in range(int(self.system['nat'])):
                 atom_pos[ia,:] = np.asarray(self._atoms_positions[ia][1:4], dtype=np.float)
                 atom_pos_bohr[ia] = [self._atoms_positions[ia][0],np.dot(vec,atom_pos[ia]).tolist()]
                 self._atoms_positions[ia]=atom_pos_bohr[ia]
@@ -267,18 +221,18 @@ class PwscfIn:
                 cell[i,:]= np.asarray(cp[:], dtype=np.float)
 
     def _rescale_pos(self, scale):
-        for ia in range(int(self._system['nat'])):
+        for ia in range(int(self.system['nat'])):
             self._atoms_positions[ia][1:4]=scale*np.asarray(self._atoms_positions[ia][1:4], dtype=np.float)
 
     def get_starting_positions(self):
-        start_atom_pos= [[],np.zeros((int(self._system['nat']),3), dtype=float)]
-        for ia in range(int(self._system['nat'])):
+        start_atom_pos= [[],np.zeros((int(self.system['nat']),3), dtype=float)]
+        for ia in range(int(self.system['nat'])):
             start_atom_pos[ia] = self._atoms_positions[ia]
         return start_atom_pos
 
     def set_positions(self,positions):
         if isinstance(positions, np.ndarray):
-            for ia in range(int(self._system['nat'])):
+            for ia in range(int(self.system['nat'])):
                 self._atoms_positions[ia][1:4]=positions[ia]
         else:
             print('passo qui')
@@ -289,11 +243,11 @@ class PwscfIn:
 # following function
 #
     def show_values(self):
-        for word in self._control:
-            print (word+"="+str(self._control[word]))
-        for word in self._system:
-            print (word+"="+str(self._system[word]))
-        for word in self._electrons:
-            print (word+"="+str(self._electrons[word]))
+        for word in self.control:
+            print (word+"="+str(self.control[word]))
+        for word in self.system:
+            print (word+"="+str(self.system[word]))
+        for word in self.electrons:
+            print (word+"="+str(self.electrons[word]))
 
 
