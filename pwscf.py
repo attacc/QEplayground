@@ -86,7 +86,6 @@ class Pwscf:
         string += self.write_kpoints()
         return string
 
-
     def read_atomicspecies(self):
         lines = iter(self.file_lines)
         for line in lines:
