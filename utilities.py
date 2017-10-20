@@ -8,4 +8,5 @@ r_or_d =r'('+real_sn + '|' + decimal + ')'
 #
 #   Units
 # 
-AngToAu=1.8897261
+ang2au=1.8897261
+au2ang=0.52917721

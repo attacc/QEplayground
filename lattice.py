@@ -12,13 +12,13 @@ def vec_in_list(veca,vec_list):
     """
     return np.array([ np.allclose(veca,vecb,rtol=atol,atol=atol) for vecb in vec_list ]).any()
 
-def red_car(red,lat):
+def red2car(red,lat):
     """
     Convert reduced coordinates to cartesian
     """
     return np.array(map( lambda coord: coord[0]*lat[0]+coord[1]*lat[1]+coord[2]*lat[2], red))
 
-def car_red(car,lat):
+def car2red(car,lat):
     """
     Convert cartesian coordinates to reduced
     """

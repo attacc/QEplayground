@@ -72,7 +72,6 @@ class Pwscf:
 
 
     def __str__(self):
-
         string=''
         string += self.stringify_group("control",self.control)
         string += self.stringify_group("system",self.system)
@@ -106,7 +105,7 @@ class Pwscf:
         for line in lines:
             if re.search(atomicp_pattern, line):
                 match = re.search(atomicp_pattern, line)
-                self.atomic_pos_type = match.group(1)
+                self.atomic_pos_type = match.group(1).lower()
                 for i in range(int(self.system["nat"])):
                     atype, x,y,z = next(lines).split()
                     self.atoms.append([atype,[float(i) for i in x,y,z]])
@@ -178,6 +177,7 @@ class Pwscf:
 
         ifile.close()
 
+
     def read_kpoints(self):
         lines = iter(self.file_lines)
         #find K_POINTS keyword in file and read next line
@@ -214,4 +214,34 @@ class Pwscf:
             for i in self.klist:
               string += ('%12.8lf '*4+'\n') % tuple(i)
         return string
+
+
+    def get_atoms(self, units):
+        from utilities import ang2au,au2ang
+        from lattice   import red2car,car2red
+        atoms= np.array([atom[1] for atom in self.atoms])
+
+        if units == self.atomic_pos_type:
+            return atoms
+
+        if self.atomic_pos_type == "angstrom":
+            atoms = atoms*ang2au
+        elif self.atomic_pos_type == "alat":
+            atoms = atoms*float(self.system['celldm(1)'])
+        elif self.atomic_pos_type == "crystal":
+            atoms = red2car(atoms, np.array(self.cell_parameters))
+
+
+        if units == "bohr":
+            return atoms
+        elif units == "alat":
+            return atoms/float(self.system['celldm(1)'])
+        elif units == "crystal":
+            return car2red(units, np.array(self.cell_parameters))
+
+    def set_atoms(self, new_atoms, units):
+        new_atoms_list=new_atoms.to_list()
+        for atom,new_atom in self.atoms, new_atoms_list:
+            atom[1]=new_atom
+        self.atomic_pos_type = units
 
