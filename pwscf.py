@@ -117,21 +117,29 @@ class Pwscf:
         return string
 
     def read_cell_parameters(self):
+        from utilities import ang2au
+        #
+        # Internal cell-paramters always in atomic units
+        # self.cell_units used only in output
+        #
         cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
         self.cell_parameters = [[1,0,0],[0,1,0],[0,0,1]]
         ibrav = int(self.system['ibrav'])
         if ibrav == 0:
-            if 'celldm(1)' in self.system.keys():
-                a = float(self.system['celldm(1)'])
-            else:
-                a = 1
             lines = iter(self.file_lines)
             for line in lines:
                 if re.search(cellp_pattern, line):
                     match = re.search(cellp_pattern, line)
                     self.cell_units = match.group(1)
+                    if self.cell_units == "alat":
+                        scale=float(self.system['celldm(1)'])
+                    elif self.cell_units == "bohr":
+                        scale=1.0
+                    elif self.cell_units == "angstrom":
+                        scale=ang2au
+
                     for i in range(3):
-                        self.cell_parameters[i] = [ float(x)*a for x in lines.next().split() ]
+                        self.cell_parameters[i] = [ float(x)*scale for x in lines.next().split() ]
         elif ibrav == 4:
             a = float(self.system['celldm(1)'])
             c = float(self.system['celldm(3)'])
@@ -149,8 +157,14 @@ class Pwscf:
 
     def write_cell_parameters(self):
         string = "CELL_PARAMETERS { %s }\n"%self.cell_units
+        if self.cell_units == "alat":
+            scale=1.0/float(self.system['celldm(1)'])
+        elif self.cell_units == "bohr":
+            scale=1.0
+        elif self.cell_units == "angstrom":
+            scale=1.0/ang2au
         for i in range(3):
-            string += ("%14.10lf "*3+"\n")%tuple(self.cell_parameters[i])
+            string += ("%14.10lf "*3+"\n")%tuple(self.cell_parameters[i]*scale)
         return string
 
     def read_namelist(self,group):
@@ -215,33 +229,44 @@ class Pwscf:
               string += ('%12.8lf '*4+'\n') % tuple(i)
         return string
 
-
-    def get_atoms(self, units):
+    def get_atoms(self, units=None):
         from utilities import ang2au,au2ang
         from lattice   import red2car,car2red
+
         atoms= np.array([atom[1] for atom in self.atoms])
+
+        units = units if units is not None else self.atomic_pos_type
 
         if units == self.atomic_pos_type:
             return atoms
 
+        scale_in =1.0
         if self.atomic_pos_type == "angstrom":
-            atoms = atoms*ang2au
+            scale_in = ang2au
         elif self.atomic_pos_type == "alat":
-            atoms = atoms*float(self.system['celldm(1)'])
+            scale_in = float(self.system['celldm(1)'])
         elif self.atomic_pos_type == "crystal":
             atoms = red2car(atoms, np.array(self.cell_parameters))
 
+        atoms=atoms*scale_in # transform in bohr
 
-        if units == "bohr":
-            return atoms
-        elif units == "alat":
-            return atoms/float(self.system['celldm(1)'])
+        scale_out=1.0
+        if units == "alat":
+            scale_out=1.0/float(self.system['celldm(1)'])
+        elif units == "angstrom":
+            scale_out=au2ang
         elif units == "crystal":
-            return car2red(units, np.array(self.cell_parameters))
+            atoms = car2red(atoms, np.array(self.cell_parameters))
+        atoms=atoms*scale_out
 
-    def set_atoms(self, new_atoms, units):
-        new_atoms_list=new_atoms.to_list()
-        for atom,new_atom in self.atoms, new_atoms_list:
-            atom[1]=new_atom
+        return atoms
+
+
+    def convert_atoms(self, units):
+        #
+        # Convert units of the internal atoms
+        # 
+        new_atoms=self.get_atoms(units).tolist()
+        for atom, self_atom in zip(new_atoms,self.atoms):
+            self_atom[1]=atom
         self.atomic_pos_type = units
-

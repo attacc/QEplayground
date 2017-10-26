@@ -39,13 +39,15 @@ class supercell():
         self.new_atoms   = self.build_supercell()
 
     def build_supercell(self):
+        #
+        # Return new atomic position in bohr
+        #
         from lattice import red2car, car2red
         from itertools import product
         latvec     = self.latvec
         R          = self.R
         atoms      = self.qe_input.get_atoms("bohr")
         new_atoms      = np.empty((self.sup_size*self.old_nat,3),dtype=float)
-        print("Dimension "+str(self.sup_size*self.old_nat))
         for nz,ny,nx in product(range(R[2]),range(R[1]),range(R[0])):
             cell=nx+ny*R[0]+nz*R[0]*R[1]
             for b in range(self.old_nat):
