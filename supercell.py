@@ -77,7 +77,9 @@ class supercell():
         qe_s.atoms = self.atoms_input(self.new_atoms)
         qe_s.control['prefix'] = qe.control['prefix'][:-1]+"_s'"
         qe_s.system['ibrav']=0
-        qe_s.cell_units = 'bohr'
+        qe_s.atomic_pos_type = 'bohr'
+        qe_s.cell_units      = 'bohr'
+        qe_s.convert_atoms(qe.atomic_pos_type)
         qe_s.cell_parameters = new_latvec
         #Just a suggestion for the new bands
         if qe.system['nbnd'] != None: qe_s.system['nbnd'] = self.sup_size*int(qe.system['nbnd'])

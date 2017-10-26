@@ -53,7 +53,7 @@ class Pwscf:
         self.electrons['conv_thr']        = float(1E-7)
         self._kpoints           = [0,0,0,0,0,0]
 
-        self.cell_units      = 'bohr'
+        self.cell_units_output  = 'bohr'
         self.atomic_pos_type = 'bohr'
 
     def write(self,filename):
@@ -120,7 +120,7 @@ class Pwscf:
         from utilities import ang2au
         #
         # Internal cell-paramters always in atomic units
-        # self.cell_units used only in output
+        # self.cell_units_output used only in output
         #
         cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
         self.cell_parameters = [[1,0,0],[0,1,0],[0,0,1]]
@@ -130,13 +130,14 @@ class Pwscf:
             for line in lines:
                 if re.search(cellp_pattern, line):
                     match = re.search(cellp_pattern, line)
-                    self.cell_units = match.group(1)
+                    cell_units = match.group(1)
                     if self.cell_units == "alat":
                         scale=float(self.system['celldm(1)'])
-                    elif self.cell_units == "bohr":
+                    elif cell_units == "bohr":
                         scale=1.0
-                    elif self.cell_units == "angstrom":
+                    elif cell_units == "angstrom":
                         scale=ang2au
+                    self.cell_units_output=cell_units
 
                     for i in range(3):
                         self.cell_parameters[i] = [ float(x)*scale for x in lines.next().split() ]
@@ -156,13 +157,15 @@ class Pwscf:
             exit(1)
 
     def write_cell_parameters(self):
-        string = "CELL_PARAMETERS { %s }\n"%self.cell_units
-        if self.cell_units == "alat":
+        string = "CELL_PARAMETERS { %s }\n"%self.cell_units_output
+        if self.cell_units_output == "alat":
             scale=1.0/float(self.system['celldm(1)'])
-        elif self.cell_units == "bohr":
+        elif self.cell_units_output == "bohr":
             scale=1.0
-        elif self.cell_units == "angstrom":
+        elif self.cell_units_output == "angstrom":
             scale=1.0/ang2au
+        else:
+            exit(1)
         for i in range(3):
             string += ("%14.10lf "*3+"\n")%tuple(self.cell_parameters[i]*scale)
         return string
@@ -270,3 +273,11 @@ class Pwscf:
         for atom, self_atom in zip(new_atoms,self.atoms):
             self_atom[1]=atom
         self.atomic_pos_type = units
+
+    def bring_atoms_in_the_cell(self):
+        import math
+        old_units=self.atomic_pos_type
+        self.convert_atoms('crystal')
+        for atom in self.atoms:
+            atom[1] = map( lambda coord: coord - math.floor(coord), atom[1])
+        self.convert_atoms(old_units)
