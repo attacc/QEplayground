@@ -1,4 +1,11 @@
 #!/usr/bin/python3
+#
+# Copyright (c) 2017, E. Cannuccia and C. Attaccalite
+# All rights reserved.
+#
+# Part of the code has been taken from the yambopy projec
+# Copyright (c) 2015, Henrique Miranda
+#
 
 import sys
 import numpy as np

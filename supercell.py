@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #
 # Copyright (c) 2015, Henrique Miranda
 # All rights reserved.
