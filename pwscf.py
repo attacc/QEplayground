@@ -28,6 +28,9 @@ class Pwscf:
 
         self.set_pwscf_default()
 
+        self.atomicp_pattern=r'\s*ATOMIC_POSITIONS\s*\{?\s*(\w*)\s*\}?'
+        self.cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
+
         if filename:
             self.read(filename)
 
@@ -108,10 +111,10 @@ class Pwscf:
 
     def read_atoms(self):
         lines = iter(self.file_lines)
-        atomicp_pattern=r'\s*ATOMIC_POSITIONS\s*\{?\s*(\w*)\s*\}?'
+        regex=re.compile(self.atomicp_pattern)
         for line in lines:
-            if re.search(atomicp_pattern, line):
-                match = re.search(atomicp_pattern, line)
+            match = regex.match(line)
+            if match is not None:
                 self.atomic_pos_type = match.group(1).lower()
                 for i in range(int(self.system["nat"])):
                     atype, x,y,z = next(lines).split()
@@ -124,19 +127,19 @@ class Pwscf:
         return string
 
     def read_cell_parameters(self):
-        from utilities import ang2au
+        from units import ang2au
         #
         # Internal cell-paramters always in atomic units
         # self.cell_units_output used only in output
         #
-        cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
         self.cell_parameters = [[1,0,0],[0,1,0],[0,0,1]]
         ibrav = int(self.system['ibrav'])
+        regex=re.compile(self.cellp_pattern)
         if ibrav == 0:
             lines = iter(self.file_lines)
             for line in lines:
-                if re.search(cellp_pattern, line):
-                    match = re.search(cellp_pattern, line)
+                match = re.match(regex, line)
+                if match is not None:
                     cell_units = match.group(1)
                     if self.cell_units == "alat":
                         scale=float(self.system['celldm(1)'])
@@ -240,7 +243,7 @@ class Pwscf:
         return string
 
     def get_atoms(self, units=None):
-        from utilities import ang2au,au2ang
+        from units     import ang2au,au2ang
         from lattice   import red2car,car2red
 
         atoms= np.array([atom[1] for atom in self.atoms])
