@@ -15,9 +15,8 @@ class dynmat:
     def __init__(self, qe_input, filename=None):
         self.qe_input=qe_input
         self.freq_pattern=r'\s*freq \(\s*(\d*)\) =\s*('+r_or_d+')\s\[THz\]'
-        self.phonons    = []
         self.nat        = int(self.qe_input.system['nat'])
-        self.n_modes    = 3*int(self.nat)
+        self.nmodes     = 3*int(self.nat)
         self.nqpoints   = 1  #Only at gamma for the momemt
         if(filename):
             self.read_dyn_output(filename)
@@ -26,13 +25,22 @@ class dynmat:
     def __del__(self):
         print("Destroy class Dynmat")
 
+    def __str__(self):
+        string=""
+        for iq in range(0,self.nqpoints):
+            string+="q = \n"
+            for im in range(0,self.nmodes):
+                string+="  mode (   %d) \n" % (im+1)
+#                for ia in range(0,self.nat):
+        return string
+
     def read_dyn_output(self, filename):
         ifile = open(filename,'r')
         self.file_lines=ifile.readlines()
         lines = iter(self.file_lines)
         ifile.close()
         regex=re.compile(self.freq_pattern)
-        self.pol_vec=np.zeros((self.nqpoints,self.n_modes,self.nat,3),dtype=complex)
+        self.pol_vec=np.zeros((self.nqpoints,self.nmodes,self.nat,3),dtype=complex)
 
         for line in lines:
             match=regex.match(line)
@@ -42,4 +50,5 @@ class dynmat:
                     tmp_vec     =re.findall(r_or_d, next(lines))
                     self.pol_vec[0][imode][ia].real=tmp_vec[0::2]
                     self.pol_vec[0][imode][ia].imag=tmp_vec[1::2]
+
 
