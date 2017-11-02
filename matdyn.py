@@ -213,7 +213,7 @@ class Matdyn():
         #plot bands
         eig = np.array(self.eig)
         for ib in range(self.nmodes):
-           plt.plot(range(self.nqpoints),eig[:,ib], 'r-', lw=2)
+           plt.plot(range(self.nqpoints),eig[:,ib], 'r-', lw=2,marker="o")
         plt.show()
 
     def get_phonon_freq(self,nq,n,unit="eV"):
