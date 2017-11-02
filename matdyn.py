@@ -2,13 +2,13 @@
 # All rights reserved.
 #
 # This file is part of yambopy
-#
+# (Slightly modified by C. Attaccalite
 #
 import os
 import re
 from math import sqrt
 import numpy as np
-from qepy.auxiliary import *
+from auxiliary import *
 
 eVtocm1 = 8065.54429
 cm1toeV = 1.0/eVtocm1
@@ -17,7 +17,7 @@ ev2ha  = 1.0/ha2ev
 Thz2cm1 = 33.35641
 cm12Thz = 1.0/33.35641
 
-class DynmatIn():
+class MatdynIn():
     """
     Generate an manipulate quantum espresso input files for matdyn.x
     """
@@ -61,7 +61,7 @@ class Matdyn():
     Class to read and plot the data from matdyn.modes files 
     """
 
-    def __init__(self,filename='matdyn.modes',path=None,folder='.',natoms=None):
+    def __init__(self,qe_input, filename):
         """
         natoms is to be removed, but for now is left for legacy purposes
         """
@@ -70,35 +70,24 @@ class Matdyn():
         self.folder   = folder
         self.path     = path
 
+        self.natoms     = int(self.qe_input.system['nat'])
+        self.nmodes     = 3*int(self.natoms)
+
         self.read_modes(filename)
 
     def read_modes(self,filename):
         """
         read the modes
         """
-        f = open("%s/%s"%(self.folder, self.filename),'r')
+        f = open(self.filename,'r')
         data_phon = f.readlines()
         f.close()
 
         #detect dimensions of the file
         #qpoints
-        nqpoints = 0
-        for line in data_phon:
-            if 'q =' in line:
-                nqpoints+=1
-        nqpoints = nqpoints
-
-        #modes
-        nline = 0
-        while 'freq' not in data_phon[nline]:
-            nline += 1
-        start_line = nline
-        nline +=1
-        while 'freq' not in data_phon[nline]:
-            nline += 1
-        end_line = nline
-        natoms = end_line-start_line-1
-        nmodes = natoms*3
+        qpattern="q ="
+        nqpoints=sum(qpattern in line for line in lines)
+        self.nqpoints= nqpoints
 
         #empty stuff
         eig = []
@@ -124,9 +113,6 @@ class Matdyn():
             eiv.append(v_frec)
 
         #store info
-        self.natoms  = natoms
-        self.nmodes  = nmodes
-        self.nqpoints= nqpoints
         self.qpoints = np.array(qpoints)
         self.eig     = np.array(eig)
         self.eiv     = np.array(eiv).reshape(nqpoints,nmodes,nmodes)
@@ -149,7 +135,7 @@ class Matdyn():
                     s += ("( "+"%12.6lf "*6+')\n')%(xr,xi,yr,yi,zr,zi)
             s += "*"*81+"\n"
             s += "\n\n"
-        
+
         if filename:
             f = open(filename,'w')
             f.write(s)
@@ -165,12 +151,12 @@ class Matdyn():
         """
         eig = self.eig
         eiv = self.eiv
-        
+
         #the eigenvalues are probably sorted but just in case...
         eig, eiv = zip(*sorted(zip(eig,eiv), key=lambda x: x[0]))
         eig = np.array(eig)
         eiv = np.array(eiv)
-        
+
         #iterate over qpoints
         for nq,(eigq,eivq) in enumerate(zip(eig,eiv)):
             #detect the degeneracies
@@ -253,10 +239,9 @@ class Matdyn():
     def normalize(self):
         """
         Normalize the displacements u^n_{ai} according to:
-        
         sum_ai ( u^n_{ai} )**2 = 1
         """
-       
+
         for nq in xrange(self.nqpoints):
             for n in xrange(self.nmodes):
                 print np.linalg.norm(self.eiv[nq,n])
@@ -265,9 +250,8 @@ class Matdyn():
     def normalize_with_masses(self,masses): 
         """
         Normalize the displacements u^n_{ai} according to:
-        
         sum_{ai} M_a u^n_{ai} u^m_{ai} = delta_{nm}
-        
+
         u -> displacement
         n -> phonon mode
         a -> atom index
@@ -312,18 +296,17 @@ class Matdyn():
                     orth[n,m] = np.vdot(e1,e2).real
         
         return np.isclose(orth,np.eye(self.nmodes),atol=atol).all()
- 
+
     def check_normalization(self,masses,atol=1e-5):
         """
         Check if the displacements are normalized according to:
-        
         sum_{ai} M_a u^n_{ai} u^m_{ai} = delta_{nm}
         """
-        
+
         masses = np.array(masses)
         ref_mass = max(masses)
         masses = masses/ref_mass
-        
+
         #check normalization
         norm = np.zeros([self.nmodes])
         for nq in xrange(self.nqpoints):
