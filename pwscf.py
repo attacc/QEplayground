@@ -33,7 +33,25 @@ class Pwscf:
 
         if filename:
             self.read(filename)
+        
+        self.set_run_options()
 
+    def set_run_options(self, nprocs=1, nthreads=1, npool=1, mpi='mpirun', pw='pw.x'):
+        self._pw      =pw
+        self._mpi     =mpi
+        self._nprocs  =nprocs
+        self._nthreads=nthreads
+        self._npool   =npool
+
+    def run(self,filename,folder='.'):
+        """ this function is used to run this job locally
+        """
+        os.system('mkdir -p %s'%folder)
+        self.write("%s/%s"%(folder,filename))
+        if procs == 1:
+            os.system('cd %s; OMP_NUM_THREADS=%d %s -inp %s > %s.log' % (folder,self._nthreads,self._pw,filename,filename))
+        else:
+            os.system('cd %s; OMP_NUM_THREADS=%d mpirun -np %d %s -inp %s > %s.log' % (folder,self._nthreads,self._nprocs,self._pw,filename,filename))
 
     def __del__(self):
         print("Destroy class PwscfIn")
@@ -241,6 +259,14 @@ class Pwscf:
             for i in self.klist:
               string += ('%12.8lf '*4+'\n') % tuple(i)
         return string
+
+    def set_atoms(self, new_atoms, units=None):
+        if units != None:
+            self.atomic_pos_type=units
+
+        positions_input = new_atoms.tolist()
+        elements_input  = [self.atoms[i][0] for i in range(int(self.system['nat']))]
+        self.atoms = [[elements_input[i], positions_input[i]] for i in range(int(self.system['nat']))]
 
     def get_atoms(self, units=None):
         from units     import ang2au,au2ang

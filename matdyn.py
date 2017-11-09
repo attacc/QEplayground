@@ -11,6 +11,7 @@ from math import sqrt
 import numpy as np
 from auxiliary import *
 from units import *
+import copy
 
 class MatdynIn():
     """
@@ -334,13 +335,14 @@ class Matdyn():
         qe_new = copy.deepcopy(self.qe_input)
 
         atoms      = self.qe_input.get_atoms("bohr")
-        new_atoms  = np.empty(self.natoms,3),dtype=float)
+        new_atoms  = np.empty((self.natoms,3),dtype=float)
 
         for a in range(self.natoms):
-            e = self.eiv[nq,n,a*3:(a+1)*3]
-            new_atoms[a,:]=atoms[a,:]+e*delta
+            e = self.eiv[iq,imode,a*3:(a+1)*3]
+            new_atoms[a][:]=atoms[a][:]+e.real*delta
+            print(atoms[a][:])
+            print(new_atoms[a][:])
 
-        qe_new.atoms=new_atoms
-        qe_new.atomic_pos_type="bohr"
+        qe_new.set_atoms(new_atoms,units='borh')
         qe_new.write(ofilename)
 
