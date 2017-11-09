@@ -10,13 +10,7 @@ import re
 from math import sqrt
 import numpy as np
 from auxiliary import *
-
-eVtocm1 = 8065.54429
-cm1toeV = 1.0/eVtocm1
-ha2ev  = 27.211396132
-ev2ha  = 1.0/ha2ev
-Thz2cm1 = 33.35641
-cm12Thz = 1.0/33.35641
+from units import *
 
 class MatdynIn():
     """
@@ -340,8 +334,9 @@ class Matdyn():
         qe_new.write(ofilename)
 
         atoms      = self.qe_input.get_atoms("bohr")
-        new_atoms      = np.empty(self.natoms,3),dtype=float)
+        new_atoms  = np.empty(self.natoms,3),dtype=float)
 
-        for ia in range(self.natoms):
-            new_atoms[ia,:]=atoms[ia,:]+self.eiv[iq,im,:]
+        for a in range(self.natoms):
+            e = self.eiv[nq,n,a*3:(a+1)*3]
+            new_atoms[a,:]=atoms[a,:]+e*delta
 
