@@ -329,9 +329,9 @@ class Matdyn():
         #
         # Displace atoms along a phonon mode [iq,imode]
         # the displacement 'delta' is in atomic units
+        # The new atomic positions are written in bohr
         #
         qe_new = copy.deepcopy(self.qe_input)
-        qe_new.write(ofilename)
 
         atoms      = self.qe_input.get_atoms("bohr")
         new_atoms  = np.empty(self.natoms,3),dtype=float)
@@ -339,4 +339,8 @@ class Matdyn():
         for a in range(self.natoms):
             e = self.eiv[nq,n,a*3:(a+1)*3]
             new_atoms[a,:]=atoms[a,:]+e*delta
+
+        qe_new.atoms=new_atoms
+        qe_new.atomic_pos_type="bohr"
+        qe_new.write(ofilename)
 
