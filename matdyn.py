@@ -326,7 +326,7 @@ class Matdyn():
                     s += ("  + i ("+"%12.8lf "*3+")\n")%tuple(mode[a*3:(a+1)*3].imag)
         return s
 
-    def generate_displacement(self, iq, imode, delta, ofilename):
+    def generate_displacement(self, iq, imode, delta):
         #
         # Displace atoms along a phonon mode [iq,imode]
         # the displacement 'delta' is in atomic units
@@ -344,5 +344,5 @@ class Matdyn():
             print(new_atoms[a][:])
 
         qe_new.set_atoms(new_atoms,units='borh')
-        qe_new.write(ofilename)
+        return qe_new
 
