@@ -340,9 +340,9 @@ class Matdyn():
         for a in range(self.natoms):
             e = self.eiv[iq,imode,a*3:(a+1)*3]
             new_atoms[a][:]=atoms[a][:]+e.real*delta
-            print(atoms[a][:])
-            print(new_atoms[a][:])
+#            print(atoms[a][:])
+#            print(new_atoms[a][:])
 
-        qe_new.set_atoms(new_atoms,units='borh')
+        qe_new.set_atoms(new_atoms,units='bohr')
         return qe_new
 

@@ -10,6 +10,7 @@
 import sys
 import numpy as np
 import re
+import os
 
 class Pwscf:
 
@@ -48,7 +49,7 @@ class Pwscf:
         """
         os.system('mkdir -p %s'%folder)
         self.write("%s/%s"%(folder,filename))
-        if procs == 1:
+        if self._nprocs == 1:
             os.system('cd %s; OMP_NUM_THREADS=%d %s -inp %s > %s.log' % (folder,self._nthreads,self._pw,filename,filename))
         else:
             os.system('cd %s; OMP_NUM_THREADS=%d mpirun -np %d %s -inp %s > %s.log' % (folder,self._nthreads,self._nprocs,self._pw,filename,filename))

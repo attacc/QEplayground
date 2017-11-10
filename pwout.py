@@ -18,12 +18,12 @@ class Pwout:
         """
         read QE output
         """
-        f = open(self.filename,'r')
-        pw_output = f.readlines()
+        f = open(filename,'r')
+        pw_output = f.read()
         f.close()
 
-        energy_pattern=r'!\s*total energy\s*=\s*('+r_or_d+')\s*Ry'
-        match=re.search(pw_output, lines, re.MULTILINE)
+        energy_pattern=r'!\s*total energy\s*=\s*('+r_or_d+') Ry'
+        match=re.search(energy_pattern, pw_output, re.MULTILINE)
         self.tot_energy=float(match.group(1))
 
     def __str__(self):
