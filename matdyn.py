@@ -135,7 +135,7 @@ class Matdyn():
             f.write(s)
             f.close()
         else:
-            print s
+            print(s)
 
     def rotate_phonons(self,eps=1e-5,debug=False):
         """

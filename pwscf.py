@@ -137,7 +137,7 @@ class Pwscf:
                 self.atomic_pos_type = match.group(1).lower()
                 for i in range(int(self.system["nat"])):
                     atype, x,y,z = next(lines).split()
-                    self.atoms.append([atype,[float(i) for i in x,y,z]])
+                    self.atoms.append([atype,[float(i) for i in [x,y,z]]])
 
     def write_atoms(self):
         string = "ATOMIC_POSITIONS { %s }\n"%self.atomic_pos_type
@@ -182,7 +182,7 @@ class Pwscf:
                                     [    0, a/2, a/2],
                                     [ -a/2, a/2,   0]]
         else:
-            print 'ibrav = %d not implemented'%ibrav
+            print('ibrav = %d not implemented'%ibrav)
             exit(1)
 
     def write_cell_parameters(self):
@@ -248,7 +248,7 @@ class Pwscf:
                             vals = lines_list[n].split()[:4]
                             self.klist.append( map(float,vals) )
                     except IndexError:
-                        print "wrong k-points list format"
+                        print("wrong k-points list format")
                         exit(1)
 
     def write_kpoints(self):
