@@ -238,7 +238,7 @@ class Matdyn():
 
         for nq in range(self.nqpoints):
             for n in range(self.nmodes):
-                print np.linalg.norm(self.eiv[nq,n])
+                print(np.linalg.norm(self.eiv[nq,n]))
                 self.eiv[nq,n] /= np.linalg.norm(self.eiv[nq,n])
 
     def normalize_with_masses(self,masses): 
@@ -264,7 +264,7 @@ class Matdyn():
                     for a in range(self.natoms):
                         self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/sqrt(masses[a])
         else:
-            print "These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it"
+            print("These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it")
 
         #enforce delta_nm
         for nq in range(self.nqpoints):

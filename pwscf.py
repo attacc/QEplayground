@@ -169,7 +169,7 @@ class Pwscf:
                     self.cell_units_output=cell_units
 
                     for i in range(3):
-                        self.cell_parameters[i] = [ float(x)*scale for x in lines.next().split() ]
+                        self.cell_parameters[i] = [ float(x)*scale for x in next(lines).split() ]
         elif ibrav == 4:
             a = float(self.system['celldm(1)'])
             c = float(self.system['celldm(3)'])
@@ -232,14 +232,14 @@ class Pwscf:
                 #chack if the type is automatic
                 if "automatic" in line.lower():
                     self.ktype = "automatic"
-                    vals = map(float, lines.next().split())
+                    vals = list(map(float, next(lines).split()))
                     self.kpoints, self.shiftk = vals[0:3], vals[3:6]
                 #otherwise read a list
                 elif "gamma" in line.lower():
                     self.ktype = "gamma"
                 else:
                     #read number of kpoints
-                    nkpoints = int(lines.next().split()[0])
+                    nkpoints = int(next(lines).split()[0])
                     self.klist = []
                     self.ktype = ""
                     try:
