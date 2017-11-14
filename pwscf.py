@@ -160,7 +160,7 @@ class Pwscf:
                 match = re.match(regex, line)
                 if match is not None:
                     cell_units = match.group(1)
-                    if self.cell_units == "alat":
+                    if cell_units == "alat":
                         scale=float(self.system['celldm(1)'])
                     elif cell_units == "bohr":
                         scale=1.0
