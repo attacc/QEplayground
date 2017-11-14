@@ -17,7 +17,8 @@ delta=0.01  # Displacement in a.u.
 scf_filename    ="diamond.scf.in"
 dynmat_filename ="dynmat.out"
 
-pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
+#pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
+pw="/home/elena/sources/qe-6.2/bin/pw.x"
 
 qe_input=Pwscf(scf_filename)
 qe_output=Pwout(qe_input)

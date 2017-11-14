@@ -3,7 +3,7 @@
 # All rights reserved.
 #
 # This file is part of yambopy
-# (Slightly modified by C. Attaccalite
+# (Slightly modified by C. Attaccalite)
 #
 import os
 import re
@@ -15,7 +15,7 @@ import copy
 
 class MatdynIn():
     """
-    Generate an manipulate quantum espresso input files for matdyn.x
+    Generate and manipulate quantum espresso input files for matdyn.x
     """
     def __init__(self):
         self.variable = dict()
@@ -82,7 +82,6 @@ class Matdyn():
         lines = iter(data_phon)
         nqpoints=sum(qpattern in line for line in lines)
         self.nqpoints= nqpoints
-
         #empty stuff
         eig = []
         eiv = []
@@ -139,7 +138,7 @@ class Matdyn():
 
     def rotate_phonons(self,eps=1e-5,debug=False):
         """
-        Rotate the degenerate states to align then with the x,y axis
+        Rotate the degenerate states to align them with the x,y axis
         Arguments:
         eps -> threshold for finding degeneracies
         """

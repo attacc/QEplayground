@@ -196,7 +196,8 @@ class Pwscf:
         else:
             exit(1)
         for i in range(3):
-            string += ("%14.10lf "*3+"\n")%tuple(self.cell_parameters[i]*scale)
+            vec=np.asarray(self.cell_parameters[i])*scale
+            string += ("%14.10lf "*3+"\n")%(vec[0],vec[1],vec[2])
         return string
 
     def read_namelist(self,group):
@@ -273,9 +274,8 @@ class Pwscf:
         from units     import ang2au,au2ang
         from lattice   import red2car,car2red
 
-        atoms= np.array([atom[1] for atom in self.atoms])
-
-        units = units if units is not None else self.atomic_pos_type
+        atoms= np.array([atom[1] for atom in self.atoms])   #atom[0] is the atomic symbol; atom[1] is the 3 coord list
+        units = units if units is not None else self.atomic_pos_type   #self.atomic_pos_type = crystal in my case
 
         if units == self.atomic_pos_type:
             return atoms
@@ -287,9 +287,10 @@ class Pwscf:
             scale_in = float(self.system['celldm(1)'])
         elif self.atomic_pos_type == "crystal":
             atoms = red2car(atoms, np.array(self.cell_parameters))
-
-        atoms=atoms*scale_in # transform in bohr
-
+ 
+        for i in range(int(self.system["nat"])):
+            atoms[i]=atoms[i]*scale_in # transform in bohr
+ 
         scale_out=1.0
         if units == "alat":
             scale_out=1.0/float(self.system['celldm(1)'])
@@ -297,7 +298,9 @@ class Pwscf:
             scale_out=au2ang
         elif units == "crystal":
             atoms = car2red(atoms, np.array(self.cell_parameters))
-        atoms=atoms*scale_out
+
+        for i in range(int(self.system["nat"])):
+            atoms[i]=atoms[i]*scale_out
 
         return atoms
 
