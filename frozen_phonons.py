@@ -12,7 +12,7 @@ from pwout  import *
 import math
 
 
-r_order=2    # Richardson extrapolation order 
+r_order=3    # Richardson extrapolation order 
 delta=0.01  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"
@@ -31,9 +31,25 @@ qe_output.read_output(folder+"/"+scf_filename+".log")
 en_equil=qe_output.tot_energy
 
 qe_dyn=Matdyn(qe_input,dynmat_filename)
+masses=qe_input.get_masses()
+qe_dyn.normalize_with_masses(masses)
 
-for im in range(0,qe_dyn.nmodes):
-    if r_order == 2:
+print("\n\n * * * Frozen phonon calculation * * *\n")
+print("Displacement    : %10.8f " % delta)
+print("Richardson order: %d " % r_order)
+
+for im in range(3,4): # qe_dyn.nmodes):
+
+    if r_order == 1:
+        qe_right=qe_dyn.generate_displacement(0, im,  delta)
+        folder="RIGHT_"+str(im)
+        qe_right.run(scf_filename,folder)
+        qe_output.read_output(folder+"/"+scf_filename+".log")
+        en_right=qe_output.tot_energy
+
+        der2=2.0*(en_right-en_equil)/delta**2
+
+    elif r_order == 2 or r_order == 3:
         qe_right=qe_dyn.generate_displacement(0, im,  delta)
         qe_left =qe_dyn.generate_displacement(0, im, -delta)
         #
@@ -49,12 +65,31 @@ for im in range(0,qe_dyn.nmodes):
 
         der2=(en_right+en_left-2.0*en_equil)/delta**2
 
-        M=1./2.*12.0107*1.660539040e-27/9.109382e-31
-        autosi=1.0/2.4188843265e-17
-        omega=sqrt(der2/M)*autosi
+        if r_order == 3:
+            der2_large=der2
+            qe_right=qe_dyn.generate_displacement(0, im,  delta/2.0)
+            qe_left =qe_dyn.generate_displacement(0, im, -delta/2.0)
+            #
+            folder="LEFT_bis_"+str(im)
+            qe_left.run(scf_filename,folder)
+            qe_output.read_output(folder+"/"+scf_filename+".log")
+            en_left=qe_output.tot_energy
+            #
+            folder="RIGHT_bis_"+str(im)
+            qe_right.run(scf_filename,folder)
+            qe_output.read_output(folder+"/"+scf_filename+".log")
+            en_right=qe_output.tot_energy
 
-        print("Mode %d   fr.(THz)   %12.8f " % (im,omega/(2.0*math.pi)/1e12))
-        print("Mode %d   fr.(cm^-1) %12.8f \n" % (im,omega/(2.0*math.pi)/1e12*33.3564))
+            der2_small=(en_right+en_left-2.0*en_equil)/(0.5*delta)**2
+
+            der2=(4.0*der2_small-der2_large)/3.0
+
+    M=1./2.*12.0107*1.660539040e-27/9.109382e-31
+    autosi=1.0/2.4188843265e-17
+    omega=sqrt(der2/M)*autosi/2.0
+
+    print("Mode %d   fr.(THz)   %12.8f " % (im,omega/(2.0*math.pi)/1e12))
+    print("Mode %d   fr.(cm^-1) %12.8f \n" % (im,omega/(2.0*math.pi)/1e12*33.3564))
 
 
 

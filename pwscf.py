@@ -306,6 +306,15 @@ class Pwscf:
 
         return atoms
 
+    def get_masses(self):
+        """ Get an array with the masses of all the atoms
+        """
+        masses = []
+        for atom in self.atoms:
+            atype = self.atypes[atom[0]]
+            mass = float(atype[0])
+            masses.append(mass)
+        return masses
 
     def convert_atoms(self, units):
         #
