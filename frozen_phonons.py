@@ -24,6 +24,12 @@ qe_input=Pwscf(scf_filename)
 qe_output=Pwout(qe_input)
 
 qe_input.set_run_options(pw=pw)
+folder="EQUIL"
+qe_input.run(scf_filename,folder)
+qe_output.read_output(folder+"/"+scf_filename+".log")
+en_equil=qe_output.tot_energy
+print(en_equil)
+exit(0)
 
 qe_dyn=Matdyn(qe_input,dynmat_filename)
 
@@ -45,5 +51,7 @@ for im in range(0,qe_dyn.nmodes):
         der2=(en_right-en_left)*2.0/delta**2
 
         print("Mode %d   frequency %f12.8    \n" % (im,der2))
-        print("Eright %12.8f        Eleft %12.8f   \n" % (en_right,en_left))
+        der2=(en_right+en_left-2.0*en_equil)/delta**2
+
+
 

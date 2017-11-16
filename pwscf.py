@@ -10,7 +10,8 @@
 import sys
 import numpy as np
 import re
-import os
+import subprocess
+
 
 class Pwscf:
 
@@ -34,7 +35,7 @@ class Pwscf:
 
         if filename:
             self.read(filename)
-        
+
         self.set_run_options()
 
     def set_run_options(self, nprocs=1, nthreads=1, npool=1, mpi='mpirun', pw='pw.x'):
@@ -47,12 +48,13 @@ class Pwscf:
     def run(self,filename,folder='.'):
         """ this function is used to run this job locally
         """
-        os.system('mkdir -p %s'%folder)
+        subprocess.call('mkdir -p %s'%folder,shell=True, cwd='./')
         self.write("%s/%s"%(folder,filename))
+        pwjob="%s -npool %d  -inp %s > %s.log" % (self._pw,self._npool,filename,filename)
         if self._nprocs == 1:
-            os.system('cd %s; OMP_NUM_THREADS=%d %s -inp %s > %s.log' % (folder,self._nthreads,self._pw,filename,filename))
+            subprocess.call('OMP_NUM_THREADS=%d %s' % (self._nthreads,pwjob),shell=True, cwd=folder)
         else:
-            os.system('cd %s; OMP_NUM_THREADS=%d mpirun -np %d %s -inp %s > %s.log' % (folder,self._nthreads,self._nprocs,self._pw,filename,filename))
+            subprocess.call('OMP_NUM_THREADS=%d mpirun -np %d %s' % (self._nthreads,self._nprocs,pwjob), shell=True, cwd=folder)
 
     def __del__(self):
         print("Destroy class PwscfIn")
