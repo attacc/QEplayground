@@ -273,8 +273,8 @@ class Matdyn():
                     e = self.eiv[nq,n,a*3:(a+1)*3]
                     #get normalization constant
                     s += masses[a]*np.vdot(e,e).real
-                self.eiv[nq,n] *= 1/sqrt(s)
-    
+                self.eiv[nq,n] *= 1.0/sqrt(s)
+
     def check_orthogonality(self,atol=1e-5):
         """
         Check if the eigenvectors are orthogonal

@@ -9,10 +9,11 @@
 from pwscf  import *
 from matdyn import *
 from pwout  import *
+from units  import autime2s,amu2au,thz2cm1
 import math
 
 
-r_order=3    # Richardson extrapolation order 
+r_order=1    # Richardson extrapolation order 
 delta=0.01  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"
@@ -32,6 +33,7 @@ en_equil=qe_output.tot_energy
 
 qe_dyn=Matdyn(qe_input,dynmat_filename)
 masses=qe_input.get_masses()
+qe_dyn.normalize()
 qe_dyn.normalize_with_masses(masses)
 
 print("\n\n * * * Frozen phonon calculation * * *\n")
@@ -84,12 +86,12 @@ for im in range(3,4): # qe_dyn.nmodes):
 
             der2=(4.0*der2_small-der2_large)/3.0
 
-    M=1./2.*12.0107*1.660539040e-27/9.109382e-31
-    autosi=1.0/2.4188843265e-17
+    M=1./2.*12.0107*amu2au
+    autosi=1.0/autime2s
     omega=sqrt(der2/M)*autosi/2.0
 
     print("Mode %d   fr.(THz)   %12.8f " % (im,omega/(2.0*math.pi)/1e12))
-    print("Mode %d   fr.(cm^-1) %12.8f \n" % (im,omega/(2.0*math.pi)/1e12*33.3564))
+    print("Mode %d   fr.(cm^-1) %12.8f \n" % (im,omega/(2.0*math.pi)/1e12*thz2cm1))
 
 
 
