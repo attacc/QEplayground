@@ -9,6 +9,7 @@
 from pwscf  import *
 from matdyn import *
 from pwout  import *
+import math
 
 
 r_order=2    # Richardson extrapolation order 
@@ -28,8 +29,6 @@ folder="EQUIL"
 qe_input.run(scf_filename,folder)
 qe_output.read_output(folder+"/"+scf_filename+".log")
 en_equil=qe_output.tot_energy
-print(en_equil)
-exit(0)
 
 qe_dyn=Matdyn(qe_input,dynmat_filename)
 
@@ -48,10 +47,14 @@ for im in range(0,qe_dyn.nmodes):
         qe_output.read_output(folder+"/"+scf_filename+".log")
         en_right=qe_output.tot_energy
 
-        der2=(en_right-en_left)*2.0/delta**2
-
-        print("Mode %d   frequency %f12.8    \n" % (im,der2))
         der2=(en_right+en_left-2.0*en_equil)/delta**2
+
+        M=1./2.*12.0107*1.660539040e-27/9.109382e-31
+        autosi=1.0/2.4188843265e-17
+        omega=sqrt(der2/M)*autosi
+
+        print("Mode %d   fr.(THz)   %12.8f " % (im,omega/(2.0*math.pi)/1e12))
+        print("Mode %d   fr.(cm^-1) %12.8f \n" % (im,omega/(2.0*math.pi)/1e12*33.3564))
 
 
 
