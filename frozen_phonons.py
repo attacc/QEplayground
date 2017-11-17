@@ -13,7 +13,7 @@ from units  import autime2s,amu2au,thz2cm1
 import math
 
 
-r_order=1    # Richardson extrapolation order 
+r_order=2    # Richardson extrapolation order 
 delta=0.01  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"
@@ -40,7 +40,7 @@ print("\n\n * * * Frozen phonon calculation * * *\n")
 print("Displacement    : %10.8f " % delta)
 print("Richardson order: %d " % r_order)
 
-for im in range(3,4): # qe_dyn.nmodes):
+for im in range(3,6): # qe_dyn.nmodes):
 
     if r_order == 1:
         qe_right=qe_dyn.generate_displacement(0, im,  delta)
@@ -88,7 +88,7 @@ for im in range(3,4): # qe_dyn.nmodes):
 
     M=1./2.*12.0107*amu2au
     autosi=1.0/autime2s
-    omega=sqrt(der2/M)*autosi/2.0
+    omega=sqrt(der2/M)*autosi/float(qe_input.system['nat']) # We should understand this factor
 
     print("Mode %d   fr.(THz)   %12.8f " % (im,omega/(2.0*math.pi)/1e12))
     print("Mode %d   fr.(cm^-1) %12.8f \n" % (im,omega/(2.0*math.pi)/1e12*thz2cm1))
