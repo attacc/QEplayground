@@ -82,6 +82,8 @@ class Pwscf:
         self.electrons['mixing_mode']     = None
         self.electrons['mixing_beta']     = None
         self.electrons['conv_thr']        = float(1E-7)
+        self.electrons['diago_full_acc']  = None
+
         self._kpoints           = [0,0,0,0,0,0]
 
         self.cell_units_output  = 'bohr'
