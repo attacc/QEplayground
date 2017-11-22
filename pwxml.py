@@ -4,11 +4,10 @@
 # This file is part of yambopy
 #
 import xml.etree.ElementTree as ET
-from   qepy.auxiliary import *
+from   auxiliary import *
 from   numpy import array
 from   lattice import *
-
-HatoeV = 27.2107
+from   units import ha2ev
 
 class PwXML():
     """ Class to read data from a Quantum espresso XML file
@@ -29,7 +28,7 @@ class PwXML():
         for filename,read in datafiles.items():
             path_filename = "%s/%s.save/%s"%(path, prefix, filename)
             if os.path.isfile(path_filename):
-                print "reading %s"%filename
+                print("reading %s"%filename)
                 done_reading = read(path_filename)
                 break
         
@@ -49,20 +48,20 @@ class PwXML():
 
         #get cell
         self.cell = []
-        for i in xrange(1,4):
+        for i in range(1,4):
             cell_lat = self.datafile_xml.findall("CELL/DIRECT_LATTICE_VECTORS/a%d"%i)[0].text
             self.cell.append([float(x) for x in cell_lat.strip().split()])
 
         #get reciprocal cell
         self.rcell = []
-        for i in xrange(1,4):
+        for i in range(1,4):
             rcell_lat = self.datafile_xml.findall("CELL/RECIPROCAL_LATTICE_VECTORS/b%d"%i)[0].text
             self.rcell.append([float(x) for x in rcell_lat.strip().split()])
 
         #get atoms
         self.natoms = int(self.datafile_xml.findall("IONS/NUMBER_OF_ATOMS")[0].text)
         self.atoms = []
-        for i in xrange(1,self.natoms+1):
+        for i in range(1,self.natoms+1):
             atom = self.datafile_xml.findall("IONS/ATOM.%d"%i)[0].get('tau')
             self.atoms.append([float(x) for x in atom.strip().split()])
 
@@ -79,9 +78,9 @@ class PwXML():
  
         #get eigenvalues
         eigen = []
-        for ik in xrange(self.nkpoints):
+        for ik in range(self.nkpoints):
             for EIGENVALUES in ET.parse( "%s/%s.save/K%05d/%s" % (self.path,self.prefix,(ik + 1),self._eig_xml) ).getroot().findall("EIGENVALUES"):
-                eigen.append(map(float, EIGENVALUES.text.split()))
+                eigen.append(list(map(float, EIGENVALUES.text.split())))
         self.eigen  = eigen
 
         #get fermi
@@ -97,7 +96,7 @@ class PwXML():
 
         #get cell
         self.cell = []
-        for i in xrange(1,4):
+        for i in range(1,4):
             cell_lat = self.datafile_xml.findall("input/atomic_structure/cell/a%d"%i)[0].text
             self.cell.append([float(x) for x in cell_lat.strip().split()])
 
@@ -106,7 +105,7 @@ class PwXML():
 
         #get reciprocal cell
         self.rcell = []
-        for i in xrange(1,4):
+        for i in range(1,4):
             rcell_lat = self.datafile_xml.findall("output/basis_set/reciprocal_lattice/b%d"%i)[0].text
             self.rcell.append([float(x) for x in rcell_lat.strip().split()])
 
@@ -114,7 +113,7 @@ class PwXML():
         self.natoms = int(self.datafile_xml.findall("output/atomic_structure")[0].get('nat'))
         self.atoms = []
         atoms = self.datafile_xml.findall("output/atomic_structure/atomic_positions/atom")
-        for i in xrange(self.natoms):
+        for i in range(self.natoms):
             atom = atoms[i].text
             self.atoms.append([float(x) for x in atom.strip().split()])
 
@@ -165,7 +164,7 @@ class PwXML():
         """ plot the eigenvalues using matplotlib
         """
         import matplotlib.pyplot as plt
-        
+
         if path:
             if isinstance(path,Path):
                 path = path.get_indexes()
@@ -181,7 +180,7 @@ class PwXML():
         #plot bands
         eigen = array(self.eigen)
         for ib in range(self.nbands):
-           plt.plot(xrange(self.nkpoints),eigen[:,ib]*HatoeV - self.fermi*HatoeV, 'r-', lw=2)
+           plt.plot(range(self.nkpoints),eigen[:,ib]*ha2ev - self.fermi*ha2ev, 'r-', lw=2)
 
         #plot options
         if xlim:
@@ -196,10 +195,10 @@ class PwXML():
         """
         if fmt=='gnuplot':
             f = open('%s.dat'%self.prefix,'w')
-            for ib in xrange(self.nbands):
-                for ik in xrange(self.nkpoints):
-                    f.write("%.1lf %.4lf \n " % (ik,self.eigen[ik][ib]*HatoeV) )
+            for ib in range(self.nbands):
+                for ik in range(self.nkpoints):
+                    f.write("%.1lf %.4lf \n " % (ik,self.eigen[ik][ib]*ha2ev) )
                 f.write("\n")
             f.close()
         else:
-            print 'fmt %s not implemented'%fmt
+            print('fmt %s not implemented'%fmt)

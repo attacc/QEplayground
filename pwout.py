@@ -14,6 +14,9 @@ class Pwout:
     def __init__(self, qe_input):
         self.tot_energy   = 0.0
         self.nkpoints     = 0
+        self.nel          = 0
+        self.nbnd         = 0
+        self.qe_input     =qe_input
 
     def read_output(self, filename):
         """
@@ -28,35 +31,31 @@ class Pwout:
         en_pattern=r'!\s*total energy\s*=\s*('+r_or_d+') Ry'
         en_regexp =re.compile(en_pattern)
 
-        nk_pattern=r'number of k points=\s*([0-9]+)'
+        nk_pattern=r'\s*number of k points=\s*([0-9]+)'
         nk_regexp =re.compile(nk_pattern)
+
+        nel_pattern=r'\s*number of electrons\s*=\s*([0-9]+)'
+        nel_regexp =re.compile(nel_pattern)
 
         for line in lines:
             match = en_regexp.match(line)
             if match is not None: self.tot_energy=float(match.group(1))
             match = nk_regexp.match(line)
-            if match is not None:
-                print("PASSO QUI ")
-                self.nkpoints  =int(match.group(1))
+            if match is not None: self.nkpoints  =int(match.group(1))
+            match = nel_regexp.match(line)
+            if match is not None: self.nel       =int(match.group(1))
 
-        print(self)
-
-        self.read_bands(pw_output)
-
-    def read_bands(self, pw_output):
-        lines=iter(pw_output)
-
-        for line in lines:
-            if "End of self-consistent calculation" in line: break
-
-        for ik in range(0,self.nkpoints):
-            print("Ciao ")
-        exit(0)
+        if self.qe_input.system['nbnd'] != None:
+            self.nbnd=int(self.qe_input.system['nbnd'])
+        else:
+        # Only valid for insulators without spin-orbit coupling
+            self.nbnd=self.nel/2
 
     def __str__(self):
         string=''
         string+='Total energy       :  %12.8f Ry\n' % self.tot_energy
         string+='Number of k-points :  %d \n' % self.nkpoints
+        string+='Number of electrons:  %d \n' % self.nel
 
         return string
 
