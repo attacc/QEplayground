@@ -7,6 +7,7 @@
 import sys
 import numpy as np
 import re
+from pwxml import *
 from utilities import r_or_d
 
 class Pwout:
@@ -18,11 +19,11 @@ class Pwout:
         self.nbnd         = 0
         self.qe_input     =qe_input
 
-    def read_output(self, filename):
+    def read_output(self, filename, path="./"):
         """
         read QE output
         """
-        f = open(filename,'r')
+        f = open(path+"/"+filename,'r')
         pw_output = f.readlines()
         f.close()
 
@@ -44,12 +45,28 @@ class Pwout:
             if match is not None: self.nkpoints  =int(match.group(1))
             match = nel_regexp.match(line)
             if match is not None: self.nel       =int(match.group(1))
+        #
+        # Now reads the XML
+        #
+        prefix=self.qe_input.control['prefix'].strip('\'')
+        self.qe_xml=PwXML(prefix=prefix,path=path)
 
-        if self.qe_input.system['nbnd'] != None:
-            self.nbnd=int(self.qe_input.system['nbnd'])
-        else:
-        # Only valid for insulators without spin-orbit coupling
-            self.nbnd=self.nel/2
+    def find_the_gap(self):
+        ival =int(self.nel/2)-1
+        icond=int(self.nel/2)
+        if self.qe_xml.nbands < icond:
+            print("Too few bands for the gap!! ")
+            return
+        eigen=np.array(self.qe_xml.eigen)
+        top_val    =np.amax(eigen[:,ival])
+        bottom_cond=np.amin(eigen[:,icond])
+
+        ind_gap=bottom_cond-top_val
+        dir_gap=np.amin(eigen[:,icond]-eigen[:,ival])
+
+        return dir_gap,ind_gap
+
+
 
     def __str__(self):
         string=''
