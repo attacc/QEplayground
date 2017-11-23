@@ -30,7 +30,7 @@ class PwXML():
         for filename,read in datafiles.items():
             path_filename = "%s/%s.save/%s"%(path, prefix, filename)
             if os.path.isfile(path_filename):
-                print("reading %s"%filename)
+#                print("reading %s"%filename)
                 done_reading = read(path_filename)
                 break
         

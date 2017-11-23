@@ -34,7 +34,6 @@ class supercell():
         self.old_nat     = int(qe_input.system['nat'])
         self.atoms       = qe_input.atoms
         self.R           = R
-        self.sup_size    = R[0]*R[1]*R[2]
         self.new_latvec  = np.array([self.latvec[i]*R[i] for i in range(3)])
         self.sup_size    = self.R[0]*self.R[1]*self.R[2]
         self.new_atoms   = self.build_supercell()
@@ -49,8 +48,8 @@ class supercell():
         R          = self.R
         atoms      = self.qe_input.get_atoms("bohr")
         new_atoms      = np.empty((self.sup_size*self.old_nat,3),dtype=float)
-        for nz,ny,nx in product(range(R[2]),range(R[1]),range(R[0])):
-            cell=nx+ny*R[0]+nz*R[0]*R[1]
+        for nz,ny,nx in product(range(self.R[2]),range(self.R[1]),range(self.R[0])):
+            cell=nx+ny*self.R[0]+nz*self.R[0]*self.R[1]
             for b in range(self.old_nat):
                 new_atoms[cell*self.old_nat+b]=atoms[b] +nx*latvec[0] +ny*latvec[1] +nz*latvec[2]
         return new_atoms
@@ -75,6 +74,7 @@ class supercell():
         #A suggestion for a consistent new kpoint mesh 
         new_kpoints = [ceil(qe.kpoints[0]/self.R[0]), ceil(qe.kpoints[1]/self.R[1]), ceil(qe.kpoints[2]/self.R[2])]
         qe_s = copy.deepcopy(qe)
+        qe_s.system['nat'] = self.old_nat*self.sup_size
         qe_s.atoms = self.atoms_input(self.new_atoms)
         qe_s.control['prefix'] = qe.control['prefix'][:-1]+"_s'"
         qe_s.system['ibrav']=0
@@ -84,6 +84,5 @@ class supercell():
         qe_s.cell_parameters = new_latvec
         #Just a suggestion for the new bands
         if qe.system['nbnd'] != None: qe_s.system['nbnd'] = self.sup_size*int(qe.system['nbnd'])
-        qe_s.system['nat'] = self.old_nat*self.sup_size
         qe_s.kpoints = new_kpoints
         return qe_s

@@ -56,8 +56,8 @@ class Pwscf:
         else:
             subprocess.call('OMP_NUM_THREADS=%d mpirun -np %d %s' % (self._nthreads,self._nprocs,pwjob), shell=True, cwd=folder)
 
-    def __del__(self):
-        print("Destroy class PwscfIn")
+#    def __del__(self):
+#        print("Destroy class PwscfIn")
 
     def set_pwscf_default(self):
         self.control['calculation']  = 'scf'
