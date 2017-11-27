@@ -13,7 +13,7 @@ from units  import autime2s,amu2au,thz2cm1
 import math
 
 
-r_order=3    # Richardson extrapolation order 
+r_order=2    # Richardson extrapolation order 
 delta=0.015  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"
@@ -27,7 +27,12 @@ qe_output=Pwout(qe_input)
 # Setup pw.x executable
 pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
 #pw="/home/elena/sources/qe-6.2/bin/pw.x"
-qe_input.set_run_options(pw=pw)
+
+#Serial job
+#qe_input.set_run_options(pw=pw)
+
+#Parallel job
+qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 
 
 # Pseudo-potential directory
