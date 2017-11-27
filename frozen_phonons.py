@@ -13,7 +13,7 @@ from units  import autime2s,amu2au,thz2cm1
 import math
 
 
-r_order=3    # Richardson extrapolation order 
+r_order=2    # Richardson extrapolation order 
 delta=0.01  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"

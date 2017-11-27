@@ -57,7 +57,7 @@ class Matdyn():
     Class to read and plot the data from matdyn.modes files 
     """
 
-    def __init__(self,qe_input, filename):
+    def __init__(self,qe_input, filename="dynmat.out"):
         """
         natoms is to be removed, but for now is left for legacy purposes
         """
