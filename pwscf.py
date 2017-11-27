@@ -316,7 +316,7 @@ class Pwscf:
             atype = self.atypes[atom[0]]
             mass = float(atype[0])
             masses.append(mass)
-        return masses
+        return np.asarray(masses)
 
     def convert_atoms(self, units):
         #

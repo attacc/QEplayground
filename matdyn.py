@@ -286,7 +286,7 @@ class Matdyn():
                 for m in range(self.nmodes):
                     e2 = self.eiv[nq,m]
                     orth[n,m] = np.vdot(e1,e2).real
-        
+
         return np.isclose(orth,np.eye(self.nmodes),atol=atol).all()
 
     def check_normalization(self,masses,atol=1e-5):
