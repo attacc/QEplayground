@@ -13,17 +13,25 @@ from units  import autime2s,amu2au,thz2cm1
 import math
 
 
-r_order=2    # Richardson extrapolation order 
-delta=0.01  # Displacement in a.u.
+r_order=3    # Richardson extrapolation order 
+delta=0.015  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"
 dynmat_filename ="dynmat.out"
 
-pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
-#pw="/home/elena/sources/qe-6.2/bin/pw.x"
+
 
 qe_input=Pwscf(scf_filename)
 qe_output=Pwout(qe_input)
+
+# Setup pw.x executable
+pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
+#pw="/home/elena/sources/qe-6.2/bin/pw.x"
+qe_input.set_run_options(pw=pw)
+
+
+# Pseudo-potential directory
+qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 
 
 print("\n\n * * * Frozen phonon calculation * * *\n")
@@ -40,9 +48,6 @@ print("Reduced    mass : %12.8f " % (M/ref_mass))
 # convert Mass to a.u.
 M       =M*amu2au
 
-# Equilibrium calculation
-
-qe_input.set_run_options(pw=pw)
 folder="EQUIL"
 qe_input.run(scf_filename,folder)
 qe_output.read_output(scf_filename+".log", path=folder)
