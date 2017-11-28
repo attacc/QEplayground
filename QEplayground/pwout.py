@@ -7,8 +7,8 @@
 import sys
 import numpy as np
 import re
-from pwxml import *
-from utilities import r_or_d
+from QEplayground.pwxml import *
+from QEplayground.utilities import r_or_d
 
 class Pwout:
 

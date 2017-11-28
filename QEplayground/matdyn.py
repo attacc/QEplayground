@@ -9,8 +9,8 @@ import os
 import re
 from math import sqrt
 import numpy as np
-from auxiliary import *
-from units import *
+from QEplayground.auxiliary import *
+from QEplayground.units import *
 import copy
 
 class MatdynIn():

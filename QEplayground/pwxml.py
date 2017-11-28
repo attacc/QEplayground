@@ -6,10 +6,10 @@
 # This file is part of yambopy
 #
 import xml.etree.ElementTree as ET
-from   auxiliary import *
 from   numpy import array
-from   lattice import *
-from   units import ha2ev
+from   QEplayground.auxiliary import *
+from   QEplayground.lattice import *
+from   QEplayground.units import ha2ev
 
 class PwXML():
     """ Class to read data from a Quantum espresso XML file

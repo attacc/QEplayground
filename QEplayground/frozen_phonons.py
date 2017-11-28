@@ -6,10 +6,10 @@
 # Calculate frozen phonon starting from pwscf input and dynmat output
 #
 
-from pwscf  import *
-from matdyn import *
-from pwout  import *
-from units  import autime2s,amu2au,thz2cm1
+from QEplayground.pwscf  import *
+from QEplayground.matdyn import *
+from QEplayground.pwout  import *
+from QEplayground.units  import autime2s,amu2au,thz2cm1
 import math
 
 

@@ -150,7 +150,7 @@ class Pwscf:
         return string
 
     def read_cell_parameters(self):
-        from units import ang2au
+        from QEplayground.units import ang2au
         #
         # Internal cell-paramters always in atomic units
         # self.cell_units_output used only in output
@@ -275,8 +275,8 @@ class Pwscf:
         self.atoms = [[elements_input[i], positions_input[i]] for i in range(int(self.system['nat']))]
 
     def get_atoms(self, units=None):
-        from units     import ang2au,au2ang
-        from lattice   import red2car,car2red
+        from QEplayground.units     import ang2au,au2ang
+        from QEplayground.lattice   import red2car,car2red
 
         atoms= np.array([atom[1] for atom in self.atoms])   #atom[0] is the atomic symbol; atom[1] is the 3 coord list
         units = units if units is not None else self.atomic_pos_type   #self.atomic_pos_type = crystal in my case
