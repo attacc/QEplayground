@@ -34,7 +34,7 @@ class Pwscf:
         self.cellp_pattern  =r'\s*CELL_PARAMETERS\s*\{?\s*(\w*)\s*\}?'
 
         if filename:
-            self.read(filename)
+           self.read(filename)
 
         self.set_run_options()
 
@@ -178,7 +178,7 @@ class Pwscf:
             a = float(self.system['celldm(1)'])
             c = float(self.system['celldm(3)'])
             self.cell_parameters = [[   a,          0,  0],
-                                    [-a/2,sqrt(3)/2*a,  0],
+                                    [-a/2,np.sqrt(3)/2*a,  0],
                                     [   0,          0,c*a]]
         elif ibrav == 2:
             a = float(self.system['celldm(1)'])

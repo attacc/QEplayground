@@ -16,11 +16,13 @@ import math
 r_order=2    # Richardson extrapolation order 
 delta=0.01  # Displacement in a.u.
 
-scf_filename    ="diamond.scf.in"
+#scf_filename    ="diamond.scf.in"
+scf_filename    ="hBN.scf.in"
+#dynmat_filename ="dynmat_C.out"
 dynmat_filename ="dynmat.out"
 
-pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
-#pw="/home/elena/sources/qe-6.2/bin/pw.x"
+#pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
+pw="/home/elena/sources/qe-6.2/bin/pw.x"
 
 qe_input=Pwscf(scf_filename)
 qe_output=Pwout(qe_input)
@@ -33,6 +35,7 @@ en_equil=qe_output.tot_energy
 
 qe_dyn=Matdyn(qe_input,dynmat_filename)
 masses=qe_input.get_masses()
+print(masses)
 qe_dyn.normalize()
 qe_dyn.normalize_with_masses(masses)
 
@@ -85,8 +88,8 @@ for im in range(3,6): # qe_dyn.nmodes):
             der2_small=(en_right+en_left-2.0*en_equil)/(0.5*delta)**2
 
             der2=(4.0*der2_small-der2_large)/3.0
-
-    M=1./2.*12.0107*amu2au
+    
+    M=1/2*12.011*amu2au
     autosi=1.0/autime2s
     omega=sqrt(der2/M)*autosi/float(qe_input.system['nat']) # We should understand this factor
 
