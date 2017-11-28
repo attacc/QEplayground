@@ -57,7 +57,7 @@ class Matdyn():
     Class to read and plot the data from matdyn.modes files 
     """
 
-    def __init__(self,qe_input, filename="dynmat.out"):
+    def __init__(self,qe_input, filename):
         """
         natoms is to be removed, but for now is left for legacy purposes
         """
@@ -286,7 +286,7 @@ class Matdyn():
                 for m in range(self.nmodes):
                     e2 = self.eiv[nq,m]
                     orth[n,m] = np.vdot(e1,e2).real
-
+        
         return np.isclose(orth,np.eye(self.nmodes),atol=atol).all()
 
     def check_normalization(self,masses,atol=1e-5):
