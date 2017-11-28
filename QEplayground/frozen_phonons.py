@@ -58,6 +58,8 @@ qe_input.run(scf_filename,folder)
 qe_output.read_output(scf_filename+".log", path=folder)
 en_equil=qe_output.tot_energy
 qe_dyn=Matdyn(qe_input,dynmat_filename)
+eig = np.array(qe_dyn.eig)
+
 
 for im in range(3,qe_dyn.nmodes):   #skyp acustic modes at q=0
     if r_order == 1:
@@ -108,8 +110,8 @@ for im in range(3,qe_dyn.nmodes):   #skyp acustic modes at q=0
     autosi=1.0/autime2s
     omega=sqrt(der2/M)*autosi/float(qe_input.system['nat']) # We should understand this factor
 
-    print("Mode %d   fr.(THz)   %12.8f " % (im+1,omega/(2.0*math.pi)/1e12))
-    print("Mode %d   fr.(cm^-1) %12.8f \n" % (im+1,omega/(2.0*math.pi)/1e12*thz2cm1))
+    print("Mode %d   fr.(THz)   %12.8f   [DFTP %12.8f]" % (im+1,omega/(2.0*math.pi)/1e12,eig[0,im]/thz2cm1))
+    print("Mode %d   fr.(cm^-1) %12.8f  [DFTP %12.8f] \n" % (im+1,omega/(2.0*math.pi)/1e12*thz2cm1,eig[0,im]))
 
 
 
