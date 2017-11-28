@@ -13,10 +13,10 @@ from QEplayground.units  import autime2s,amu2au,thz2cm1
 import math
 
 
-r_order=2    # Richardson extrapolation order 
-delta=0.015  # Displacement in a.u.
+r_order=3    # Richardson extrapolation order 
+delta=0.02  # Displacement in a.u.
 
-scf_filename    ="diamond.scf.in"
+scf_filename    ="hBN.scf.in"
 dynmat_filename ="dynmat.out"
 
 
