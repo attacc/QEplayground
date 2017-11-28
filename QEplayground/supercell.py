@@ -13,7 +13,7 @@ import re
 from math import *
 import numpy as np
 import copy
-from pwscf import Pwscf
+from QEplayground.pwscf import Pwscf
 
 class supercell():
     """
@@ -42,7 +42,7 @@ class supercell():
         #
         # Return new atomic position in bohr
         #
-        from lattice import red2car, car2red
+        from QEplayground.lattice import red2car, car2red
         from itertools import product
         latvec     = self.latvec
         R          = self.R
