@@ -51,6 +51,7 @@ print("Reference  mass : %12.8f " % ref_mass)
 print("Reduced    mass : %12.8f " % (M/ref_mass))
 
 # convert Mass to a.u.
+M       =M*float(qe_input.system['nat'])*2.0
 M       =M*amu2au
 
 folder="EQUIL"
@@ -108,7 +109,7 @@ for im in range(3,qe_dyn.nmodes):   #skyp acustic modes at q=0
 
 
     autosi=1.0/autime2s
-    omega=sqrt(der2/M)*autosi/float(qe_input.system['nat']) # We should understand this factor
+    omega=sqrt(der2/M)*autosi # We should understand this factor
 
     print("Mode %d   fr.(THz)   %12.8f   [DFTP %12.8f]" % (im+1,omega/(2.0*math.pi)/1e12,eig[0,im]/thz2cm1))
     print("Mode %d   fr.(cm^-1) %12.8f  [DFTP %12.8f] \n" % (im+1,omega/(2.0*math.pi)/1e12*thz2cm1,eig[0,im]))

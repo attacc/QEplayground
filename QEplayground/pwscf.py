@@ -214,7 +214,12 @@ class Pwscf:
                     group[keyword] = value.strip().strip(',')
 
     def read(self, filename):
-        ifile = open(filename,'r')
+        try:
+            ifile = open(filename,'r')
+        except:
+            print("Error opening : "+filename)
+            exit(1)
+
         self.file_lines=ifile.readlines()
 
         self.read_namelist(self.control)
