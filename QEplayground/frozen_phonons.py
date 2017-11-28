@@ -48,7 +48,7 @@ masses=qe_input.get_masses()
 ref_mass=max(masses)
 M       =1.0/(np.sum(np.reciprocal(masses)))
 print("Reference  mass : %12.8f " % ref_mass)
-print("Reduced    mass : %12.8f " % (M/ref_mass))
+print("Reduced    mass : %12.8f [ref_mass units]  %12.8f  [amu]" % (M/ref_mass,M ))
 
 # convert Mass to a.u.
 M       =M*float(qe_input.system['nat'])*2.0
