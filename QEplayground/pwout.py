@@ -40,7 +40,8 @@ class Pwout:
 
         for line in lines:
             match = en_regexp.match(line)
-            if match is not None: self.tot_energy=float(match.group(1))
+            if match is not None:
+                self.tot_energy=float(match.group(1))/2.0 # from Rydberg to Hartree
             match = nk_regexp.match(line)
             if match is not None: self.nkpoints  =int(match.group(1))
             match = nel_regexp.match(line)
