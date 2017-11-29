@@ -1,0 +1,31 @@
+ &control
+    calculation = 'scf'
+    restart_mode='from_scratch',
+    prefix='bn',
+    pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF',
+    outdir='./'
+    wf_collect=.true.
+ /
+ &system    
+    ibrav=  4 
+    celldm(1) = 4.7177372151 
+    celldm(3) = 2.6052311410
+    nat=  4
+     ntyp= 2
+    ecutwfc = 50.0 
+ /
+ &electrons
+    mixing_mode = 'plain'
+    mixing_beta = 0.7 
+    conv_thr =  1.0d-10
+ /
+ATOMIC_SPECIES 
+ B 10.811  B.pz-vbc.UPF     
+ N 14.006  N.pz-vbc.UPF 
+ATOMIC_POSITIONS crystal 
+ B      6.6666666666E-01  3.3333333333E-01  -0.250000000000E+00
+ N     -6.6666666666E-01 -3.3333333333E-01  -0.250000000000E+00
+ N      6.6666666666E-01  3.3333333333E-01  0.25000000000E+00
+ B     -6.6666666666E-01 -3.3333333333E-01   0.25000000000E+00
+K_POINTS automatic
+6 6 2 0 0 0

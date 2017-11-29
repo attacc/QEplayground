@@ -1,0 +1,9 @@
+&input
+    asr='simple'
+    flfrc='diamond.fc', 
+    flfrq='diamond.freq'
+    q_in_cryst_coord=.true.
+ /
+2
+0 0 0 
+0 0.5 0.5

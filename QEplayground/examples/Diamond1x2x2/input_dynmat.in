@@ -1,0 +1,6 @@
+&input
+ fildyn='C.dynG',
+ asr='simple',
+ fileig='dynmat.eig'
+/
+

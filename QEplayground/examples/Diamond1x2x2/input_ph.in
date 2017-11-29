@@ -1,0 +1,9 @@
+diamond_phonons
+&inputph
+  tr2_ph=1.0d-14,
+  amass(1)=12.0107 
+  prefix='diamond_s',
+  outdir='./',
+  fildyn='C.dynG'
+ /
+0.0 0.0 0.0
