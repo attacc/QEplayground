@@ -3,99 +3,97 @@
 # Copyright (c) 2017, E. Cannuccia and C. Attaccalite
 # All rights reserved.
 #
-# Calculate frozen phonon starting from pwscf input and dynmat output
+# Calculate zpr starting from pwscf input and dynmat output
 #
 
-from pwscf  import *
-from matdyn import *
-from pwout  import *
-from units  import ha2ev
+from QEplayground.pwscf  import *
+from QEplayground.matdyn import *
+from QEplayground.pwout  import *
+from QEplayground.units  import ha2ev
 import math
 
 
-r_order=3    # Richardson extrapolation order 
-delta=0.01  # Displacement in a.u.
+def zpr(qe_input, qe_dyn, delta, r_order=2, modes=None):
+    
+    string="\n\n* * * Zero Point Motion calculations * * *\n\n"
+    string+="Reference  mass : %12.8f \n" % ref_mass
+    string+="Reduced    mass : %12.8f [ref_mass units]  %12.8f  [amu]\n" % (M/ref_mass,M )
 
-scf_filename    ="diamond.scf.in"
-dynmat_filename ="dynmat.out"
+    ofile=open("zpr.log","w")
+    ofile.write(string)
 
-pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
-#pw="/home/elena/sources/qe-6.2/bin/pw.x"
+    # output reader
+    qe_output=Pwout(qe_input)
 
-qe_input=Pwscf(scf_filename)
-qe_output=Pwout(qe_input)
+    scf_filename="scf.in"
 
-# Setup the band gap calculation
+    #Equilibrium calculation   
+    folder="EQUIL"
+    qe_input.run(scf_filename,folder)
+    qe_output.read_output(scf_filename+".log", path=folder)
+    dir_gap_eq, ind_gap_eq=qe_output.find_the_gap()
 
-qe_input.electrons['diago_full_acc']='.true.'
-qe_input.system['nbnd']             =7
+    print("\n\n * * * ZPR contribution for the different phonons * * *\n")
+    print("Displacement    : %10.8f " % delta)
+    print("Richardson order: %d " % r_order)
 
-qe_input.set_run_options(pw=pw)
-folder="EQUIL"
-qe_input.run(scf_filename,folder)
+    print("Equilibrium indirect gap: %12.8f " % (ind_gap_eq*ha2ev))
+    print("Equilibrium direct gap  : %12.8f " % (dir_gap_eq*ha2ev))
 
-qe_output.read_output(scf_filename+".log", path=folder)
-dir_gap_eq, ind_gap_eq=qe_output.find_the_gap()
+    # DFTP results
+    eig = np.array(qe_dyn.eig)
 
-qe_dyn=Matdyn(qe_input,dynmat_filename)
-masses=qe_input.get_masses()
-qe_dyn.normalize()
-qe_dyn.normalize_with_masses(masses)
+    if modes == None:
+        modes = range(3, qe_dyn.nmodes) #skyp acustic modes at q=0
 
-print("\n\n * * * ZPR contribution for the different phonons * * *\n")
-print("Displacement    : %10.8f " % delta)
-print("Richardson order: %d " % r_order)
+    for im in modes:
+        print(" Calculating mode %d .... " % (im+1))
+        if r_order == 1:
+            qe_right=qe_dyn.generate_displacement(0, im,  delta)
+            folder="RIGHT_"+str(im)
+            qe_right.run(scf_filename,folder)
+            qe_output.read_output(scf_filename+".log", path=folder)
+            dir_gap_right, ind_gap_right=qe_output.find_the_gap()
+            der2=2.0*(dir_gap_right-dir_gap_eq)/delta**2
 
-print("Equilibrium indirect gap: %12.8f " % (ind_gap_eq*ha2ev))
-print("Equilibrium direct gap  : %12.8f " % (dir_gap_eq*ha2ev))
-
-for im in range(3,6):
-
-    if r_order == 1:
-        qe_right=qe_dyn.generate_displacement(0, im,  delta)
-        folder="RIGHT_"+str(im)
-        qe_right.run(scf_filename,folder)
-        qe_output.read_output(scf_filename+".log", path=folder)
-
-        dir_gap_right, ind_gap_right=qe_output.find_the_gap()
-        der2=2.0*(dir_gap_right-dir_gap_eq)/delta**2
-
-    elif r_order == 2 or r_order == 3:
-        qe_right=qe_dyn.generate_displacement(0, im,  delta)
-        qe_left =qe_dyn.generate_displacement(0, im, -delta)
-        #
-        folder="LEFT_"+str(im)
-        qe_left.run(scf_filename,folder)
-        qe_output.read_output(scf_filename+".log", path=folder)
-        dir_gap_left, ind_gap_left=qe_output.find_the_gap()
-        #
-        folder="RIGHT_"+str(im)
-        qe_right.run(scf_filename,folder)
-        qe_output.read_output(scf_filename+".log", path=folder)
-        dir_gap_right, ind_gap_right=qe_output.find_the_gap()
-
-        der2=(dir_gap_right+dir_gap_left-2.0*dir_gap_eq)/delta**2
-
-        if r_order == 3:
-            der2_large=der2
-            qe_right=qe_dyn.generate_displacement(0, im,  delta/2.0)
-            qe_left =qe_dyn.generate_displacement(0, im, -delta/2.0)
+        elif r_order == 2 or r_order == 3:
+            qe_right=qe_dyn.generate_displacement(0, im,  delta)
+            qe_left =qe_dyn.generate_displacement(0, im, -delta)
             #
-            folder="LEFT_bis_"+str(im)
+            folder="LEFT_"+str(im)
             qe_left.run(scf_filename,folder)
             qe_output.read_output(scf_filename+".log", path=folder)
             dir_gap_left, ind_gap_left=qe_output.find_the_gap()
             #
-            folder="RIGHT_bis_"+str(im)
+            folder="RIGHT_"+str(im)
             qe_right.run(scf_filename,folder)
             qe_output.read_output(scf_filename+".log", path=folder)
             dir_gap_right, ind_gap_right=qe_output.find_the_gap()
 
-            der2_small=(dir_gap_right+dir_gap_left-2.0*dir_gap_eq)/(0.5*delta)**2
+            der2=(dir_gap_right+dir_gap_left-2.0*dir_gap_eq)/delta**2
 
-            der2=(4.0*der2_small-der2_large)/3.0
+            if r_order == 3:
+                der2_large=der2
+                qe_right=qe_dyn.generate_displacement(0, im,  delta/2.0)
+                qe_left =qe_dyn.generate_displacement(0, im, -delta/2.0)
+                #
+                folder="LEFT_bis_"+str(im)
+                qe_left.run(scf_filename,folder)
+                qe_output.read_output(scf_filename+".log", path=folder)
+                dir_gap_left, ind_gap_left=qe_output.find_the_gap()
+                #
+                folder="RIGHT_bis_"+str(im)
+                qe_right.run(scf_filename,folder)
+                qe_output.read_output(scf_filename+".log", path=folder)
+                dir_gap_right, ind_gap_right=qe_output.find_the_gap()
 
-    print("Mode %d   der2 gap   %12.8f " % (im, der2*ha2ev))
+                der2_small=(dir_gap_right+dir_gap_left-2.0*dir_gap_eq)/(0.5*delta)**2
 
+                der2=(4.0*der2_small-der2_large)/3.0
 
+        string = "Mode %d   der2 gap   %12.8f "  % (im, der2*ha2ev)
+        print(string)
 
+        ofile.write(string)
+
+    ofile.close()
