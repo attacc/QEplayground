@@ -7,6 +7,8 @@ import math
 
 r_order=3    # Richardson extrapolation order 
 delta=0.0172 # Displacement in a.u.
+ZPR_on_state = [0, 6]  # 3(+1) is the top of the valence band in diamond
+                               # the three states are degenerate
 
 scf_filename    ="diamond.scf.in"
 dynmat_filename ="dynmat.out"
@@ -33,4 +35,4 @@ qe_input.control['pseudo_dir']="'/home/elena/Research/pseudo'"
 qe_input.electrons['diago_full_acc']='.true.'
 qe_input.system['nbnd']             =7
 
-zpr(qe_input, qe_dyn, delta, r_order=r_order)
+zpr(qe_input, qe_dyn, delta, ZPR_on_state[0], ZPR_on_state[1], r_order=r_order)

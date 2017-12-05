@@ -51,6 +51,11 @@ class Pwout:
         #
         prefix=self.qe_input.control['prefix'].strip('\'')
         self.qe_xml=PwXML(prefix=prefix,path=path)
+  
+    def get_dft_energy(self, kp, band):
+        eigen=np.array(self.qe_xml.eigen)
+        dft_energy = eigen[kp, band]
+        return dft_energy
 
     def find_the_gap(self):
         ival =int(self.nel/2)-1
