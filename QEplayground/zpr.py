@@ -41,8 +41,9 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
     print("Equilibrium indirect gap: %12.8f " % (ind_gap_eq*ha2ev))
     print("Equilibrium direct gap  : %12.8f " % (dir_gap_eq*ha2ev))
 
-    # DFTP results
-    eig = np.array(qe_dyn.eig)
+    # DFT results
+    eigen=np.array(qe_xml.eigen)
+    
 
     if modes == None:
        modes = range(3, qe_dyn.nmodes) #skip acustic modes at q=0
