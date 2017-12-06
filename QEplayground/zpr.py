@@ -10,11 +10,24 @@ from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
 from QEplayground.pwxml  import *
-from QEplayground.units  import ha2ev
+from QEplayground.units  import ha2ev, amu2au, cm1toeV, ev2ha
 import math
 
 
 def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
+
+    masses=qe_input.get_masses()
+    ref_mass=max(masses)
+    M       =1.0/(np.sum(np.reciprocal(masses)))
+#    M       =M*float(qe_input.system['nat'])
+
+    # convert Mass to a.u.
+    M       =M*amu2au
+   
+    # DFTP results
+    DFTP_freq = np.array(qe_dyn.eig)
+    DFTP_freq = DFTP_freq*cm1toeV*ev2ha
+    #print(DFTP_freq[0,:])
 
     string="\n\n* * * Zero Point Motion calculations * * *\n\n"
 
@@ -40,10 +53,6 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
 
     print("Equilibrium indirect gap: %12.8f " % (ind_gap_eq*ha2ev))
     print("Equilibrium direct gap  : %12.8f " % (dir_gap_eq*ha2ev))
-
-    # DFT results
-    eigen=np.array(qe_xml.eigen)
-    
 
     if modes == None:
        modes = range(3, qe_dyn.nmodes) #skip acustic modes at q=0
@@ -93,9 +102,10 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
                 #
                 der2_small=(dft_energy_right+dft_energy_left-2.0*dft_energy_eq)/(0.5*delta)**2
 
-                der2=(4.0*der2_small-der2_large)/3.0
+                der2 = (4.0*der2_small-der2_large)/3.0
+                der2 = der2/2/M/DFTP_freq[0,im]/2  # Last division by 2 is the 1/2 of the zpr
 
-        string = "Mode %d   der2 gap   %12.8f meV \n"  % (im+1, der2*ha2ev/1000)
+        string = "Mode %d   der2 gap   %12.8f \n"  % (im+1, der2)
         print(string)
         der2_meV += der2*ha2ev/1000
         ofile.write(string)

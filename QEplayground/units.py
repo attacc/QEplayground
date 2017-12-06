@@ -7,7 +7,6 @@ eVtocm1 = 8065.54429
 cm1toeV = 1.0/eVtocm1
 ha2ev   = 27.211396132
 ev2ha   = 1.0/ha2ev
-Thz2cm1 = 33.35641
 cm12Thz = 1.0/33.35641
 autime2s= 2.418884326505e-17
 amu2kg  = 1.660539040e-27

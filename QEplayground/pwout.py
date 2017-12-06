@@ -70,7 +70,7 @@ class Pwout:
         ind_gap=bottom_cond-top_val
         dir_gap=np.amin(eigen[:,icond]-eigen[:,ival])
 
-        return ival, icond, dir_gap,ind_gap
+        return dir_gap,ind_gap
 
 
 
