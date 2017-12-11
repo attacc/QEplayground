@@ -103,7 +103,7 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
                 der2_small=(dft_energy_right+dft_energy_left-2.0*dft_energy_eq)/(0.5*delta)**2
 
                 der2 = (4.0*der2_small-der2_large)/3.0
-                der2 = der2/2/M/DFTP_freq[0,im]/2  # Last division by 2 is the 1/2 of the zpr
+                der2 = der2/2/M/(2.0*math.pi)/DFTP_freq[0,im]/2  # Last division by 2 is the 1/2 of the zpr
 
         string = "Mode %d   der2 gap   %12.8f \n"  % (im+1, der2)
         print(string)
