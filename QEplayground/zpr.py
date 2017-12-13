@@ -25,8 +25,8 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
     M       =M*amu2au
    
     # DFTP results
-    DFTP_freq = np.array(qe_dyn.eig)
-    DFTP_freq = DFTP_freq*cm1toeV*ev2ha
+    DFTP_freq_cm1 = np.array(qe_dyn.eig)
+    DFTP_freq     = DFTP_freq_cm1*cm1toeV*ev2ha
     #print(DFTP_freq[0,:])
 
     string="\n\n* * * Zero Point Motion calculations * * *\n\n"
@@ -66,7 +66,7 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
     der2_meV = 0.0
 
     for im in modes:
-        print(" Calculating mode %d .... " % (im+1))
+        print(" Calculating mode %d  with frequency %12.8f Thz" % (im+1, DFTP_freq_cm1[0,im]))
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)
             #

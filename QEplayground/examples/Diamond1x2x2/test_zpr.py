@@ -7,8 +7,6 @@ import math
 
 r_order=3    # Richardson extrapolation order 
 delta=0.0172 # Displacement in a.u.
-ZPR_on_state = [0, 6]  # 3(+1) is the top of the valence band in diamond
-                               # the three states are degenerate
 
 scf_filename    ="diamond.scf.in"
 dynmat_filename ="dynmat.out"
@@ -23,7 +21,7 @@ pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
 #qe_input.set_run_options(pw=pw)
 
 #Parallel job
-qe_input.set_run_options(pw=pw, nprocs=4, npool=2)
+qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 
 
 # Pseudo-potential directory
@@ -33,6 +31,10 @@ qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 
 # Setup the band gap calculation
 qe_input.electrons['diago_full_acc']='.true.'
-qe_input.system['nbnd']             =7
+qe_input.system['nbnd']             = 21
 
-zpr(qe_input, qe_dyn, delta, 0, [1,2,3,4], r_order=r_order)
+bands = [18,19,20]
+
+modes = [11]
+
+zpr(qe_input, qe_dyn, delta, 0, bands, r_order=r_order, modes=modes)
