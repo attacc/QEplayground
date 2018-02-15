@@ -296,10 +296,9 @@ class Pwscf:
             scale_in = float(self.system['celldm(1)'])
         elif self.atomic_pos_type == "crystal":
             atoms = red2car(atoms, np.array(self.cell_parameters))
- 
-        for i in range(int(self.system["nat"])):
-            atoms[i]=atoms[i]*scale_in # transform in bohr
- 
+
+        atoms*=scale_in # transform in bohr
+
         scale_out=1.0
         if units == "alat":
             scale_out=1.0/float(self.system['celldm(1)'])
@@ -308,8 +307,7 @@ class Pwscf:
         elif units == "crystal":
             atoms = car2red(atoms, np.array(self.cell_parameters))
 
-        for i in range(int(self.system["nat"])):
-            atoms[i]=atoms[i]*scale_out
+        atoms*=scale_out # transform in bohr
 
         return atoms
 

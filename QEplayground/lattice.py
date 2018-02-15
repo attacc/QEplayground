@@ -16,14 +16,19 @@ def red2car(red,lat):
     """
     Convert reduced coordinates to cartesian
     """
-    #return np.array(map( lambda coord: coord[0]*lat[0]+coord[1]*lat[1]+coord[2]*lat[2], red))
-    return list(map( lambda coord: coord[0]*lat[0]+coord[1]*lat[1]+coord[2]*lat[2], red))
+    new_pos=[]
+    for row in red:
+        new_pos.append(np.matmul(row,lat))
+    return np.array(new_pos)
 
 def car2red(car,lat):
     """
     Convert cartesian coordinates to reduced
     """
-    return np.array(map( lambda coord: np.linalg.solve(np.array(lat).T,coord), car))
+    new_pos=[]
+    for row in car:
+        new_pos.append(np.linalg.solve(np.array(lat).T,row))
+    return np.array(new_pos)
 
 def rec_lat(lat):
     """
