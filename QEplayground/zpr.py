@@ -10,7 +10,7 @@ from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
 from QEplayground.pwxml  import *
-from QEplayground.units  import ha2ev, amu2au, cm1toeV, ev2ha
+from QEplayground.units  import ha2ev, amu2au, cm1toeV, ev2ha, ang2au
 import math
 
 
@@ -23,7 +23,9 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
 
     # convert Mass to a.u.
     M       =M*amu2au
-   
+
+    qe_input.convert_atoms("angstrom")
+
     # DFTP results
     DFTP_freq_cm1 = np.array(qe_dyn.eig)
     DFTP_freq     = DFTP_freq_cm1*cm1toeV*ev2ha
@@ -113,7 +115,7 @@ def zpr(qe_input, qe_dyn, delta, kp, bands, r_order=2, modes=None):
 
         values =str(im+1)+"         "
         for count in range(len(bands)):
-            values +="  %12.8f      "% (der2[count])
+            values +="  %12.8f      "% (der2[count]*ang2au**2)
         ofile.write(values+"\n")
 
         der2 = der2/2/M/(2.0*math.pi)/DFTP_freq[0,im]/2  # Last division by 2 is the 1/2 of the zpr
