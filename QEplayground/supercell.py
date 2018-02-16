@@ -34,7 +34,9 @@ class supercell():
         self.old_nat     = int(qe_input.system['nat'])
         self.atoms       = qe_input.atoms
         self.R           = R
-        self.new_latvec  = np.array([self.latvec[i]*R[i] for i in range(3)])
+        self.new_latvec  = np.empty_like(self.latvec)
+        for i in range(3):
+            self.new_latvec[i]  = self.latvec[i]*R[i]
         self.sup_size    = self.R[0]*self.R[1]*self.R[2]
         self.new_atoms   = self.build_supercell()
 
@@ -80,8 +82,8 @@ class supercell():
         qe_s.system['ibrav']=0
         qe_s.atomic_pos_type = 'bohr'
         qe_s.cell_units      = 'bohr'
-        qe_s.convert_atoms(qe.atomic_pos_type)
         qe_s.cell_parameters = new_latvec
+        qe_s.convert_atoms(qe.atomic_pos_type)
         #Just a suggestion for the new bands
         if qe.system['nbnd'] != None: qe_s.system['nbnd'] = self.sup_size*int(qe.system['nbnd'])
         qe_s.kpoints = new_kpoints
