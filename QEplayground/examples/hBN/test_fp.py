@@ -2,7 +2,7 @@ from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.frozen_phonons import *
 
-r_order=3    # Richardson extrapolation order 
+r_order=2    # Richardson extrapolation order 
 delta=0.02  # Displacement in a.u.
 
 scf_filename    ="hBN.scf.in"
