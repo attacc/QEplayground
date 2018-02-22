@@ -48,8 +48,7 @@ class Pwscf:
     def run(self,filename,folder='.'):
         """ this function is used to run this job locally
         """
-        subprocess.call('mkdir -p %s'%folder,shell=True, cwd='./')
-        self.write("%s/%s"%(folder,filename))
+        self.write(filename,folder=folder)
         pwjob="%s -npool %d  -inp %s > %s.log" % (self._pw,self._npool,filename,filename)
         if self._nprocs == 1:
             subprocess.call('OMP_NUM_THREADS=%d %s' % (self._nthreads,pwjob),shell=True, cwd=folder)
@@ -89,8 +88,10 @@ class Pwscf:
         self.cell_units_output  = 'bohr'
         self.atomic_pos_type = 'bohr'
 
-    def write(self,filename):
-        f = open(filename,'w')
+    def write(self,filename, folder="."):
+        if folder != ".":
+            subprocess.call('mkdir -p %s'%folder,shell=True, cwd='./')
+        f = open("%s/%s"%(folder,filename),'w')
         f.write(str(self))
         f.close()
 

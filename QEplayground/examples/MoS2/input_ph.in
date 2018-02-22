@@ -1,0 +1,12 @@
+mos2_phonons
+&inputph
+  tr2_ph=1.0d-14,
+  amass(1)=95.94
+  amass(2)=32.065
+  amass(2)=
+  prefix='MoS2',
+  outdir='./',
+  fildyn='MoS2.dynG'
+  ldisp=.true.
+  nq1=2, nq2=2, nq3=1
+ /

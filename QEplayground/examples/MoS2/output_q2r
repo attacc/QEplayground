@@ -1,0 +1,50 @@
+
+     Program Q2R v.6.1 (svn rev. 13369) starts on 22Feb2018 at 23:17:25 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI), running on     1 processors
+
+     reading grid info from file MoS2.dynG0    
+  reading force constants from file MoS2.dynG1
+ macroscopic fields = T
+   6.29208   0.00000   0.00000
+   0.00000   6.29208   0.00000
+   0.00000  -0.00000   1.47145
+  na=            1
+  -1.16940   0.00000   0.00000
+  -0.00000  -1.16940   0.00000
+   0.00000   0.00000  -0.12168
+  na=            2
+   0.58635  -0.00000  -0.00000
+   0.00000   0.58635  -0.00000
+   0.00000  -0.00000   0.06098
+  na=            3
+   0.58635  -0.00000   0.00000
+   0.00000   0.58635  -0.00000
+   0.00000   0.00000   0.06098
+  nqs=            1
+ q=   0.00000000  0.00000000  0.00000000
+  reading force constants from file MoS2.dynG2
+  nqs=            3
+ q=   0.00000000 -0.57735027  0.00000000
+ q=   0.50000000  0.28867514  0.00000000
+ q=  -0.50000000  0.28867514  0.00000000
+
+      q-space grid ok, #points =    4
+
+      fft-check warning: sum of imaginary terms = 2.518611E-11
+
+     Q2R          :     0.00s CPU         0.00s WALL
+
+
+   This run was terminated on:  23:17:25  22Feb2018            
+
+=------------------------------------------------------------------------------=
+   JOB DONE.
+=------------------------------------------------------------------------------=
