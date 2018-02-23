@@ -47,9 +47,9 @@ def single_mode_thermal_line(qe_input, qe_dyn, modes):
 
     for im in modes:
 
-        w_atom_units=eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+        w_atomic_units=eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
 
-        delta=1.0/np.sqrt(2.0*M*w_atom_units)
+        delta=1.0/np.sqrt(2.0*M*w_atomic_units)
 
         print("Displacement mode %d = %12.8f a.u. \n" % (im+1,delta))
 
@@ -57,11 +57,8 @@ def single_mode_thermal_line(qe_input, qe_dyn, modes):
         qe_left =qe_dyn.generate_displacement(0, im, -delta)
         #
         folder="LEFT_"+str(im)
-#        qe_left.run(scf_filename,folder)
-#        qe_output.read_output(scf_filename+".log", folder)
-#        en_left=qe_output.tot_energy
+        qe_left.write(scf_filename,folder)
         #
         folder="RIGHT_"+str(im)
-#        qe_right.run(scf_filename,folder)
-#        qe_output.read_output(scf_filename+".log", folder)
-#        en_right=qe_output.tot_energy
+        qe_right.write(scf_filename,folder)
+
