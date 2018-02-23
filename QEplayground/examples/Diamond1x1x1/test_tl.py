@@ -2,11 +2,11 @@ from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.thermal_lines import *
 
-scf_filename    ="diamond.scf.in"
-dynmat_filename ="dynmat.out"
+scf_filename  ="diamond.scf.in"
+eigv_filename ="diamond.eigv"
 
 qe_input =Pwscf(scf_filename)
-qe_dyn=Matdyn(qe_input,dynmat_filename)
+qe_dyn=Matdyn(qe_input,eigv_filename)
 
 pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
 

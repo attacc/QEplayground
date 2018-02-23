@@ -20,7 +20,7 @@ def single_mode_thermal_line(qe_input, qe_dyn, modes):
     M       =1.0/(np.sum(np.reciprocal(masses)))
     M       =M*float(qe_input.system['nat'])
 
-    string="\n\n* * * Frozen phonon calculations * * *\n\n"
+    string="\n\n* * * Thermal line * * *\n\n"
     string+="Reference  mass : %12.8f \n" % ref_mass
     string+="Reduced    mass : %12.8f [ref_mass units]  %12.8f  [amu]\n" % (M/ref_mass,M )
 
@@ -35,13 +35,17 @@ def single_mode_thermal_line(qe_input, qe_dyn, modes):
     scf_filename="scf.in"
 
     #Equilibrium calculation
-    folder="EQUIL"
-    qe_input.run(scf_filename,folder)
-    qe_output.read_output(scf_filename+".log", path=folder)
-    en_equil=qe_output.tot_energy
+    #folder="EQUIL"
+    #qe_input.run(scf_filename,folder)
+    #qe_output.read_output(scf_filename+".log", path=folder)
+    #en_equil=qe_output.tot_energy
 
     # DFTP results
     eig = np.array(qe_dyn.eig)
+
+    qe_dyn.normalize_with_masses(masses)
+    qe_dyn.normalize()
+    qe_dyn.write_modes("mass_norm.modes")
 
     print("\n")
 
@@ -49,9 +53,11 @@ def single_mode_thermal_line(qe_input, qe_dyn, modes):
 
         w_atomic_units=eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
 
-        delta=1.0/np.sqrt(2.0*M*w_atomic_units)
+        delta=1.0/np.sqrt(2.0*w_atomic_units)
 
         print("Displacement mode %d = %12.8f a.u. \n" % (im+1,delta))
+        
+        qe_dyn.print_atomic_sigma_amplitude(0,im, delta)
 
         qe_right=qe_dyn.generate_displacement(0, im,  delta)
         qe_left =qe_dyn.generate_displacement(0, im, -delta)

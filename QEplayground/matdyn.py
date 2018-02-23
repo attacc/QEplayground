@@ -239,7 +239,7 @@ class Matdyn():
             for n in range(self.nmodes):
                 self.eiv[nq,n] /= np.linalg.norm(self.eiv[nq,n])
 
-    def normalize_with_masses(self,masses): 
+    def normalize_with_masses(self,masses):
         """
         Normalize the displacements u^n_{ai} according to:
         sum_{ai} M_a u^n_{ai} u^m_{ai} = delta_{nm}
@@ -252,8 +252,6 @@ class Matdyn():
         """
 
         masses = np.array(masses)
-        ref_mass = max(masses)
-        masses = masses/ref_mass
 
         #divide by masses
         if self.check_orthogonality():
@@ -323,6 +321,14 @@ class Matdyn():
                     s += ("%12.8lf "*3)%tuple(mode[a*3:(a+1)*3].real)
                     s += ("  + i ("+"%12.8lf "*3+")\n")%tuple(mode[a*3:(a+1)*3].imag)
         return s
+
+    def print_atomic_sigma_amplitude(self, iq, imode, delta):
+        for a in range(self.natoms):
+            e = self.eiv[iq,imode,a*3:(a+1)*3]
+            sigma_atom= np.vdot(e,e).real/np.sqrt(amu2au)*delta
+            print("Displacement for atom %d = %12.8f a.u. \n" % (a,sigma_atom))
+
+
 
     def generate_displacement(self, iq, imode, delta):
         #
