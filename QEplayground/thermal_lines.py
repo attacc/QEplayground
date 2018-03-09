@@ -63,8 +63,8 @@ def single_mode_thermal_line(qe_input, qe_dyn, modes):
 #        qe_right=qe_dyn.generate_displacement(0, im,  delta)
 #        qe_left =qe_dyn.generate_displacement(0, im, -delta)
         #
-        folder="LEFT_"+str(im)
-        qe_left.write(scf_filename,folder)
+#        folder="LEFT_"+str(im)
+#        qe_left.write(scf_filename,folder)
         #
-        folder="RIGHT_"+str(im)
-        qe_right.write(scf_filename,folder)
+#        folder="RIGHT_"+str(im)
+#        qe_right.write(scf_filename,folder)
