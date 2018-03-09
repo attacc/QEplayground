@@ -91,11 +91,18 @@ def print_thermal_lines(qe_input, qe_dyn):
     qe_dyn.normalize()
     qe_dyn.write_modes("mass_norm.modes")
 
-    #sign generation
-    single_mode_sign = [-1.0, 1.0]
+    tl_list=qe_dyn.generate_thermal_lines(mode_range=[3])
 
-    nmodes=qe_dyn.nmodes-3 # remove acoustic modes
-    for mode_signs in product(single_mode_sign,repeat=nmodes):
-        qe_new=qe_dyn.generate_thermal_lines(mode_signs)
-        new_atoms=qe_new.get_atoms()
-        print(new_atoms)
+    for tl in tl_list:
+        print(tl)
+        print("\n")
+    #sign generation
+#    single_mode_sign = [-1.0, 1.0]
+#
+#    nmodes=qe_dyn.nmodes-3 # remove acoustic modes
+#    for mode_signs in product(single_mode_sign,repeat=nmodes):
+#        qe_new=qe_dyn.generate_thermal_lines(mode_signs,mode_range=[3,4])
+#        new_atoms=qe_new.get_atoms()
+#        print("Termal line: "+str(mode_signs))
+#        print(new_atoms)
+##        print("\n")

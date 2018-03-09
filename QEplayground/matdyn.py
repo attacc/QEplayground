@@ -7,10 +7,11 @@
 #
 import os
 import re
-from math import sqrt,pi
+import math
 import numpy as np
 from QEplayground.auxiliary import *
 from QEplayground.units import *
+from itertools import product
 import copy
 
 class MatdynIn():
@@ -258,7 +259,7 @@ class Matdyn():
             for nq in range(self.nqpoints):
                 for n in range(self.nmodes):
                     for a in range(self.natoms):
-                        self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/sqrt(masses[a])
+                        self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/math.sqrt(masses[a])
         else:
             print("These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it")
 
@@ -270,7 +271,7 @@ class Matdyn():
                     e = self.eiv[nq,n,a*3:(a+1)*3]
                     #get normalization constant
                     s += masses[a]*np.vdot(e,e).real
-                self.eiv[nq,n] *= 1.0/sqrt(s)
+                self.eiv[nq,n] *= 1.0/math.sqrt(s)
 
     def check_orthogonality(self,atol=1e-5):
         """
@@ -328,23 +329,37 @@ class Matdyn():
             sigma_atom= np.vdot(e,e).real/np.sqrt(amu2au)*delta
             print("Displacement for atom %d = %12.8f a.u. \n" % (a,sigma_atom))
 
-    def generate_thermal_lines(self, mode_signs):
-        qe_new = copy.deepcopy(self.qe_input)
+    def generate_thermal_lines(self, mode_range=None):
 
         atoms      = self.qe_input.get_atoms("bohr")
         new_atoms  = np.empty((self.natoms,3),dtype=float)
-        new_atoms  = atoms
         masses     = self.qe_input.get_masses()
 
-        for im in range(3,self.nmodes):
-            w_atomic_units = self.eig[0,im]*(2.0*pi)/thz2cm1*autime2s*1e12
-            delta = 1.0/np.sqrt(2.0*w_atomic_units)*mode_signs[im-3]
-            for a in range(self.natoms):
-                e = self.eiv[0,im,a*3:(a+1)*3]
-                new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
+        #sign generation
+        single_mode_sign = [-1.0, 1.0]
 
-        qe_new.set_atoms(new_atoms,units='bohr')
-        return qe_new
+        if mode_range == None:
+            mode_range=range(3, self.nmodes)
+
+        print(" Modes range : "+str(mode_range))
+
+        lines_sign=product(single_mode_sign,repeat=len(mode_range))
+
+        print(" Number of thermal lines: %d\n" % (int(math.pow(2,len(mode_range)))))
+
+        thermal_lines_list=[]
+
+        for line_sign in lines_sign:
+            new_atoms  = atoms.copy()
+            for im in mode_range:
+                w_atomic_units = self.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+                delta =1.0/np.sqrt(2.0*w_atomic_units)*line_sign[im-3]
+                for a in range(self.natoms):
+                    e = self.eiv[0,im,a*3:(a+1)*3]
+                    new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
+            thermal_lines_list.append(new_atoms)
+
+        return thermal_lines_list
 
     def generate_displacement(self, iq, imode, delta):
         #

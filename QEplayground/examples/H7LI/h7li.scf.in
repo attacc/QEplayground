@@ -1,7 +1,7 @@
  &control
     calculation = 'scf',
     prefix='diamond', 
-    pseudo_dir = '/home/attaccalite/SOFTWARE/PSEUDO_PWSCF/',
+    pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF/',
     wf_collect=.true.,
     verbosity ='high'
  /
@@ -22,7 +22,7 @@ CELL_PARAMETERS { alat }
   0.0000000000   0.5000000000   0.5000000000 
 ATOMIC_SPECIES
  H  1.00794 H.pz-vbc.UPF
- Li 6.941   Li.pz-vbc.UPF
+ Li 6.941   Li.pz-n-vbc.UPF
 ATOMIC_POSITIONS {alat}
  H 0 0  0 
  Li 0.5 0.5  0.5 
