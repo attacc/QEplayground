@@ -7,7 +7,7 @@
 #
 import os
 import re
-from math import sqrt
+from math import sqrt,pi
 import numpy as np
 from QEplayground.auxiliary import *
 from QEplayground.units import *
@@ -328,7 +328,23 @@ class Matdyn():
             sigma_atom= np.vdot(e,e).real/np.sqrt(amu2au)*delta
             print("Displacement for atom %d = %12.8f a.u. \n" % (a,sigma_atom))
 
+    def generate_thermal_lines(self, mode_signs):
+        qe_new = copy.deepcopy(self.qe_input)
 
+        atoms      = self.qe_input.get_atoms("bohr")
+        new_atoms  = np.empty((self.natoms,3),dtype=float)
+        new_atoms  = atoms
+        masses     = self.qe_input.get_masses()
+
+        for im in range(3,self.nmodes):
+            w_atomic_units = self.eig[0,im]*(2.0*pi)/thz2cm1*autime2s*1e12
+            delta = 1.0/np.sqrt(2.0*w_atomic_units)*mode_signs[im-3]
+            for a in range(self.natoms):
+                e = self.eiv[0,im,a*3:(a+1)*3]
+                new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
+
+        qe_new.set_atoms(new_atoms,units='bohr')
+        return qe_new
 
     def generate_displacement(self, iq, imode, delta):
         #
