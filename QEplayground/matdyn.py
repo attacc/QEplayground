@@ -348,3 +348,17 @@ class Matdyn():
         qe_new.set_atoms(new_atoms,units='bohr')
         return qe_new
 
+    def print_atoms_sigma(self, iq, imode, delta):
+        #
+        # Print atoms sigma for a given phonon mode
+        # in a.u. 
+        #
+        masses = self.qe_input.get_masses()
+
+        for a in range(self.natoms):
+            e = self.eiv[iq,imode,a*3:(a+1)*3]
+            norm  = np.sqrt(np.vdot(e,e).real)
+            sigma = float(norm*delta/np.sqrt(masses[a]*amu2au))
+            print("Atom %d  mass %12.8f sigma %12.8f" % (a,masses[a], sigma))
+
+

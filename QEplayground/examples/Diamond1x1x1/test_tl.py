@@ -20,5 +20,5 @@ qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 # Pseudo-potential directory
 qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 
-single_mode_thermal_line(qe_input, qe_dyn, modes=[3])
+single_mode_thermal_line(qe_input, qe_dyn, modes=[3,4,5])
 
