@@ -348,18 +348,20 @@ class Matdyn():
         print(" Number of thermal lines: %d\n" % (int(math.pow(2,len(mode_range)))))
 
         thermal_lines_list=[]
+        signs_list        =[]
 
         for line_sign in lines_sign:
             new_atoms  = atoms.copy()
             for im in mode_range:
                 w_atomic_units = self.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-                delta =1.0/np.sqrt(2.0*w_atomic_units)*line_sign[im-3]
+                delta =line_sign[im-3]/np.sqrt(2.0*w_atomic_units)*line_sign[im-3]
                 for a in range(self.natoms):
                     e = self.eiv[0,im,a*3:(a+1)*3]
                     new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
             thermal_lines_list.append(new_atoms)
+            signs_list.append(line_sign)
 
-        return thermal_lines_list
+        return thermal_lines_list #,signs_list
 
     def generate_displacement(self, iq, imode, delta):
         #

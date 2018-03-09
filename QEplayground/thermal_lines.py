@@ -91,9 +91,12 @@ def print_thermal_lines(qe_input, qe_dyn):
     qe_dyn.normalize()
     qe_dyn.write_modes("mass_norm.modes")
 
+#    tl_list,tl_signs=qe_dyn.generate_thermal_lines(mode_range=[3])
     tl_list=qe_dyn.generate_thermal_lines(mode_range=[3])
 
+#    for tl,tl_sign in zip(tl_list,tl_signs):
     for tl in tl_list:
+#        print(tl_sign)
         print(tl)
         print("\n")
     #sign generation
