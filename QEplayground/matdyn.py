@@ -352,9 +352,9 @@ class Matdyn():
 
         for line_sign in lines_sign:
             new_atoms  = atoms.copy()
-            for im in mode_range:
+            for im,im_sign in zip(mode_range,lign_sign):
                 w_atomic_units = self.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-                delta =line_sign[im-3]/np.sqrt(2.0*w_atomic_units)*line_sign[im-3]
+                delta =1.0/np.sqrt(2.0*w_atomic_units)*im_sign
                 for a in range(self.natoms):
                     e = self.eiv[0,im,a*3:(a+1)*3]
                     new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
