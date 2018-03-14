@@ -1,9 +1,10 @@
  &control
     calculation = 'scf',
-    prefix='diamond', 
+    prefix='lih', 
     pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF/',
     wf_collect=.true.,
     verbosity ='high'
+    disk_io='none'
  /
  &system
     ibrav=  0, 
@@ -14,7 +15,7 @@
     nbnd=2    
  /
  &electrons
-   conv_thr = 1.0d-12
+   conv_thr = 1.0d-10
    diago_full_acc=.true.
  /
 CELL_PARAMETERS { alat }
