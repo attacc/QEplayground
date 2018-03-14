@@ -35,6 +35,7 @@ class Pwscf:
 
         if filename:
            self.read(filename)
+           self.filename=filename
 
         self.set_run_options()
 
@@ -221,6 +222,7 @@ class Pwscf:
             print("Error opening : "+filename)
             exit(1)
 
+        self.filename=filename
         self.file_lines=ifile.readlines()
 
         self.read_namelist(self.control)

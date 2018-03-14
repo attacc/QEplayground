@@ -12,100 +12,67 @@ from QEplayground.matdyn import *
 from QEplayground.pwout  import *
 from QEplayground.units  import autime2s,amu2au,thz2cm1
 from itertools import *
-
 import math
+import random
 
-def single_mode_thermal_line(qe_input, qe_dyn, modes):
 
-    masses=qe_input.get_masses()
-    ref_mass=max(masses)
-    M       =1.0/(np.sum(np.reciprocal(masses)))
-    M       =M*float(qe_input.system['nat'])
+def generate_thermal_lines(qe_dyn, folder="TL", n_tlines=None, tl2_lines=True, mode_range=None, debug=None):
 
-    string="\n\n* * * Thermal line * * *\n\n"
-    string+="Reference  mass : %12.8f \n" % ref_mass
-    string+="Reduced    mass : %12.8f [ref_mass units]  %12.8f  [amu]\n" % (M/ref_mass,M )
+    atoms      = qe_dyn.qe_input.get_atoms("bohr")
+    new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
+    masses     = qe_dyn.qe_input.get_masses()
 
-    print(string)
+    if mode_range == None:
+        mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
 
-    # convert Mass to a.u.
-    M       =M*amu2au
-
-    # output reader
-
-    scf_filename="scf.in"
-
-    # DFTP results
-    eig = np.array(qe_dyn.eig)
-
-    qe_dyn.normalize_with_masses(masses)
-    qe_dyn.normalize()
-    qe_dyn.write_modes("mass_norm.modes")
-
-    print("\n")
-
-    for im in modes:
-
-        w_atomic_units=eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-
-        delta=1.0/np.sqrt(2.0*w_atomic_units)
-
-        print("Displacement mode %d = %12.8f a.u. \n" % (im+1,delta))
-        qe_dyn.print_atomic_sigma_amplitude(0,im, delta)
-
-        qe_dyn.print_atoms_sigma(0,im, delta)
-
-#        qe_right=qe_dyn.generate_displacement(0, im,  delta)
-#        qe_left =qe_dyn.generate_displacement(0, im, -delta)
+    tl_list=[]  # Thermal lines list
+    
+    if n_tlines == None:
         #
-#        folder="LEFT_"+str(im)
-#        qe_left.write(scf_filename,folder)
+        # Generate all possible thermal lines
+        # this part may explode in large/medium systems
+        # lines_sign is a list of all possible sign combination 2^nmodes
         #
-#        folder="RIGHT_"+str(im)
-#        qe_right.write(scf_filename,folder)
+        single_mode_sign = [-1.0, 1.0]
+        all_sign=product(single_mode_sign,repeat=len(mode_range))
+
+        for l_sign in all_sign:
+            tl_list.append(l_sign)
+    else:
+        for i in range(n_tlines):
+            tmp_list=[random.randint(0,1) for p in range(len(mode_range))]
+            l_sign = [-1.0 if x == 0 else float(x) for x in tmp_list]
+            tl_list.append(l_sign)
+            if tl2_lines:
+                minus_line=[-float(x) for x in l_sign]
+                tl_list.append(minus_line)
+                # Add the thermal line with opposite sign
+
+    qe_new=copy.deepcopy(qe_dyn.qe_input)
+
+    if debug:
+        print("\n\n Sign list \n")
+        for line_sign in tl_list:
+            print(line_sign)
+        print("\n\n Themal lines \n")
+
+    ic=0
+    for tl_line in tl_list:
+        new_atoms  = atoms.copy()
+        for im,im_sign in zip(mode_range,tl_line):
+            w_atomic_units = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+            delta =1.0/np.sqrt(2.0*w_atomic_units)*im_sign
+            for a in range(qe_dyn.natoms):
+                e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
+                new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
+        ic=ic+1
+
+        if not debug:
+            qe_new.set_atoms(new_atoms,units="bohr")
+            qe_new.write(qe_dyn.qe_input.filename+"_TL"+str(ic),folder)
+        else:
+            print("Thermal line: %d " %(ic))
+            print(new_atoms)
 
 
 
-def print_thermal_lines(qe_input, qe_dyn):
-
-    masses=qe_input.get_masses()
-    ref_mass=max(masses)
-    M       =1.0/(np.sum(np.reciprocal(masses)))
-    M       =M*float(qe_input.system['nat'])
-
-    string="\n\n* * * Thermal line * * *\n\n"
-    string+="Reference  mass : %12.8f \n" % ref_mass
-    string+="Reduced    mass : %12.8f [ref_mass units]  %12.8f  [amu]\n" % (M/ref_mass,M )
-
-    print(string)
-
-    # convert Mass to a.u.
-    M       =M*amu2au
-
-    scf_filename="scf.in"
-
-    # DFTP results
-    eig = np.array(qe_dyn.eig)
-
-    qe_dyn.normalize_with_masses(masses)
-    qe_dyn.normalize()
-    qe_dyn.write_modes("mass_norm.modes")
-
-#    tl_list,tl_signs=qe_dyn.generate_thermal_lines(mode_range=[3])
-    tl_list=qe_dyn.generate_thermal_lines(mode_range=[3])
-
-#    for tl,tl_sign in zip(tl_list,tl_signs):
-    for tl in tl_list:
-#        print(tl_sign)
-        print(tl)
-        print("\n")
-    #sign generation
-#    single_mode_sign = [-1.0, 1.0]
-#
-#    nmodes=qe_dyn.nmodes-3 # remove acoustic modes
-#    for mode_signs in product(single_mode_sign,repeat=nmodes):
-#        qe_new=qe_dyn.generate_thermal_lines(mode_signs,mode_range=[3,4])
-#        new_atoms=qe_new.get_atoms()
-#        print("Termal line: "+str(mode_signs))
-#        print(new_atoms)
-##        print("\n")
