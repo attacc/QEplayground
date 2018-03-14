@@ -11,10 +11,11 @@
     nat=  2, 
     ntyp= 2,
     ecutwfc = 70
-     
+    nbnd=2    
  /
  &electrons
    conv_thr = 1.0d-12
+   diago_full_acc=.true.
  /
 CELL_PARAMETERS { alat }
   0.5000000000   0.0000000000   0.5000000000 
