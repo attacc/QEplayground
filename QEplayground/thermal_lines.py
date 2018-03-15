@@ -10,13 +10,14 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
-from QEplayground.units  import autime2s,amu2au,thz2cm1
+from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin
+from QEplayground.utilities import bose
 from itertools import *
 import math
 import random
 
 
-def generate_thermal_lines(qe_dyn, folder="TL", n_tlines=None, tl2_lines=True, mode_range=None, debug=None):
+def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=True, mode_range=None, debug=None):
 
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
@@ -27,6 +28,10 @@ def generate_thermal_lines(qe_dyn, folder="TL", n_tlines=None, tl2_lines=True, m
     if not qe_dyn.check_orthogonality():
         print("Error phonon eigenvectors not orthogonal!!! ")
         exit(0)
+    #
+    # Folder name with temperature
+    #
+    folder=folder+str(T)+"K"
     #
     if mode_range == None:
         mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
@@ -66,8 +71,21 @@ def generate_thermal_lines(qe_dyn, folder="TL", n_tlines=None, tl2_lines=True, m
     for tl_line in tl_list:
         new_atoms  = atoms.copy()
         for im,im_sign in zip(mode_range,tl_line):
-            w_atomic_units = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-            delta =1.0/np.sqrt(2.0*w_atomic_units)*im_sign
+            #
+            # Gaussian width
+            #
+            # see Eq. 12 of arXiv:1512.06377v1
+            #
+            w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+            q_0  = 1.0/math.sqrt(2.0*w_au)
+            q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
+            #
+            if debug:
+                print("W and T atomic units : %12.8f, %12.8f " % (w_au,T/au2kelvin))
+                print("Amplitude at T=0     : %12.8f " % q_0)
+                print("Amplitude at finite T: %12.8f " % q_T)
+            #
+            delta =q_T*im_sign
             for a in range(qe_dyn.natoms):
                 e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
                 new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
