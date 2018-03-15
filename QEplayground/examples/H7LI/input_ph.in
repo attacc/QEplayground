@@ -1,4 +1,4 @@
-mos2_phonons
+lih_phonons
 &inputph
   tr2_ph=1.0d-12,
   amass(1)=1.00794
@@ -6,6 +6,6 @@ mos2_phonons
   prefix='lih',
   outdir='./',
   fildyn='lih.dynG'
-  ldisp=.true.
-  nq1=2, nq2=2, nq3=2
+  trans=.true.
  /
+0.0 0.0 0.0

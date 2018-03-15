@@ -1,6 +1,6 @@
 &input
- fildyn='C.dynG',
+ fildyn='lih.dynG',
  asr='simple',
- fileig='dynmat.eig'
+ fileig='lih.eig'
 /
 

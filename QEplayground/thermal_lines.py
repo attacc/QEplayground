@@ -21,12 +21,18 @@ def generate_thermal_lines(qe_dyn, folder="TL", n_tlines=None, tl2_lines=True, m
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
     masses     = qe_dyn.qe_input.get_masses()
-
+    #
+    # Check ortogonaly of the phonon eigenvectors
+    # 
+    if not qe_dyn.check_orthogonality():
+        print("Error phonon eigenvectors not orthogonal!!! ")
+        exit(0)
+    #
     if mode_range == None:
         mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
 
     tl_list=[]  # Thermal lines list
-    
+
     if n_tlines == None:
         #
         # Generate all possible thermal lines
