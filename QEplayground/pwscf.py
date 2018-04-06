@@ -35,6 +35,7 @@ class Pwscf:
 
         if filename:
            self.read(filename)
+           self.filename=filename
 
         self.set_run_options()
 
@@ -48,8 +49,7 @@ class Pwscf:
     def run(self,filename,folder='.'):
         """ this function is used to run this job locally
         """
-        subprocess.call('mkdir -p %s'%folder,shell=True, cwd='./')
-        self.write("%s/%s"%(folder,filename))
+        self.write(filename,folder=folder)
         pwjob="%s -npool %d  -inp %s > %s.log" % (self._pw,self._npool,filename,filename)
         if self._nprocs == 1:
             subprocess.call('OMP_NUM_THREADS=%d %s' % (self._nthreads,pwjob),shell=True, cwd=folder)
@@ -89,8 +89,10 @@ class Pwscf:
         self.cell_units_output  = 'bohr'
         self.atomic_pos_type = 'bohr'
 
-    def write(self,filename):
-        f = open(filename,'w')
+    def write(self,filename, folder="."):
+        if folder != ".":
+            subprocess.call('mkdir -p %s'%folder,shell=True, cwd='./')
+        f = open("%s/%s"%(folder,filename),'w')
         f.write(str(self))
         f.close()
 
@@ -220,6 +222,7 @@ class Pwscf:
             print("Error opening : "+filename)
             exit(1)
 
+        self.filename=filename
         self.file_lines=ifile.readlines()
 
         self.read_namelist(self.control)
@@ -296,10 +299,9 @@ class Pwscf:
             scale_in = float(self.system['celldm(1)'])
         elif self.atomic_pos_type == "crystal":
             atoms = red2car(atoms, np.array(self.cell_parameters))
- 
-        for i in range(int(self.system["nat"])):
-            atoms[i]=atoms[i]*scale_in # transform in bohr
- 
+
+        atoms*=scale_in # transform in bohr
+
         scale_out=1.0
         if units == "alat":
             scale_out=1.0/float(self.system['celldm(1)'])
@@ -308,8 +310,7 @@ class Pwscf:
         elif units == "crystal":
             atoms = car2red(atoms, np.array(self.cell_parameters))
 
-        for i in range(int(self.system["nat"])):
-            atoms[i]=atoms[i]*scale_out
+        atoms*=scale_out # transform in bohr
 
         return atoms
 

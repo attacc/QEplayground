@@ -9,7 +9,7 @@
              ecutwfc = 80
                ibrav = 0
                 ntyp = 1
-            celldm(1) = 6.675
+            celldm(1)= 6.7860064
                  nat = 8
 /&end
 &electrons
@@ -31,4 +31,4 @@ ATOMIC_POSITIONS { alat }
   C   0.5000000000   1.0000000000   0.5000000000
   C   0.7500000000   1.2500000000   0.7500000000
 K_POINTS { automatic }
- 4  2  2  0  0  0
+ 8  4  4  0  0  0

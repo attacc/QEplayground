@@ -1,0 +1,6 @@
+&input
+ fildyn='lih.dynG',
+ asr='simple',
+ fileig='lih.eig'
+/
+

@@ -1,0 +1,9 @@
+&input
+    asr='simple'
+    flfrc='MoS2.fc', 
+    flfrq='MoS2.freq'
+    q_in_cryst_coord=.true.
+ /
+2
+0 0 0 
+0 0.5 0

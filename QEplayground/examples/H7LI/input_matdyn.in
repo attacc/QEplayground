@@ -1,0 +1,11 @@
+&input
+    asr='simple'
+    flfrc='lih.fc', 
+    flfrq='lih.freq'
+    flvec='lih_matdyn.modes'
+    fleig='lih_eigev.modes'
+    q_in_cryst_coord=.true.
+ /
+2
+0 0 0 
+0 0.5 0

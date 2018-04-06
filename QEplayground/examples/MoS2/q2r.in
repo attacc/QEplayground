@@ -1,0 +1,5 @@
+&input
+    fildyn='MoS2.dynG'
+    zasr='simple', 
+    flfrc='MoS2.fc'
+/

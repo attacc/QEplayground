@@ -7,10 +7,12 @@
 #
 import os
 import re
-from math import sqrt
+import math
 import numpy as np
+import random
 from QEplayground.auxiliary import *
 from QEplayground.units import *
+from itertools import product
 import copy
 
 class MatdynIn():
@@ -239,7 +241,7 @@ class Matdyn():
             for n in range(self.nmodes):
                 self.eiv[nq,n] /= np.linalg.norm(self.eiv[nq,n])
 
-    def normalize_with_masses(self,masses): 
+    def normalize_with_masses(self,masses):
         """
         Normalize the displacements u^n_{ai} according to:
         sum_{ai} M_a u^n_{ai} u^m_{ai} = delta_{nm}
@@ -252,15 +254,13 @@ class Matdyn():
         """
 
         masses = np.array(masses)
-        ref_mass = max(masses)
-        masses = masses/ref_mass
 
         #divide by masses
         if self.check_orthogonality():
             for nq in range(self.nqpoints):
                 for n in range(self.nmodes):
                     for a in range(self.natoms):
-                        self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/sqrt(masses[a])
+                        self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/math.sqrt(masses[a])
         else:
             print("These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it")
 
@@ -272,7 +272,7 @@ class Matdyn():
                     e = self.eiv[nq,n,a*3:(a+1)*3]
                     #get normalization constant
                     s += masses[a]*np.vdot(e,e).real
-                self.eiv[nq,n] *= 1.0/sqrt(s)
+                self.eiv[nq,n] *= 1.0/math.sqrt(s)
 
     def check_orthogonality(self,atol=1e-5):
         """
@@ -311,7 +311,7 @@ class Matdyn():
                 norm[n] = s
 
         return np.isclose(norm,np.ones(self.nmodes),atol=atol).all()
- 
+
     def __str__(self):
         s = ""
         for nq in range(self.nqpoints):
@@ -323,6 +323,9 @@ class Matdyn():
                     s += ("%12.8lf "*3)%tuple(mode[a*3:(a+1)*3].real)
                     s += ("  + i ("+"%12.8lf "*3+")\n")%tuple(mode[a*3:(a+1)*3].imag)
         return s
+
+
+
 
     def generate_displacement(self, iq, imode, delta):
         #
@@ -342,3 +345,14 @@ class Matdyn():
         qe_new.set_atoms(new_atoms,units='bohr')
         return qe_new
 
+    def print_atoms_sigma(self, iq, imode, delta):
+        #
+        # Print atoms sigma for a given phonon mode
+        # in a.u. 
+        #
+        masses = self.qe_input.get_masses()
+        for a in range(self.natoms):
+            e = self.eiv[iq,imode,a*3:(a+1)*3]
+            norm  = np.sqrt(np.vdot(e,e).real)
+            sigma = float(norm*delta/np.sqrt(masses[a]*amu2au))
+            print("Atom %d  mass %12.8f sigma %12.8f" % (a,masses[a], sigma))

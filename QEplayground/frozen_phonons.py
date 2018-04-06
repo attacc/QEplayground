@@ -17,7 +17,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     masses=qe_input.get_masses()
     ref_mass=max(masses)
     M       =1.0/(np.sum(np.reciprocal(masses)))
-    M       =M*float(qe_input.system['nat'])
+    M       =M*float(qe_input.system['nat'])  # is this 2*number of unit cells?
 
     string="\n\n* * * Frozen phonon calculations * * *\n\n"
     string+="Reference  mass : %12.8f \n" % ref_mass

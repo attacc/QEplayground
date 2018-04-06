@@ -1,20 +1,17 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
-from QEplayground.frozen_phonons import *
+from QEplayground.thermal_lines import *
 
-r_order=2    # Richardson extrapolation order 
-delta=0.02  # Displacement in a.u.
-
-scf_filename    ="hBN.scf.in"
-dynmat_filename ="dynmat.out"
+scf_filename  ="diamond.scf.in"
+eigv_filename ="diamond.eigv"
 
 qe_input =Pwscf(scf_filename)
-qe_dyn=Matdyn(qe_input,dynmat_filename)
+qe_dyn=Matdyn(qe_input,eigv_filename)
 
 pw="/home/attacc/SOFTWARE/qe-6.1/bin/pw.x"
 
 #Serial job
-#qe_input.set_run_options(pw=pw)
+qe_input.set_run_options(pw=pw)
 
 #Parallel job
 qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
@@ -23,5 +20,5 @@ qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 # Pseudo-potential directory
 qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 
-frozen_phonons(qe_input, qe_dyn, delta, r_order=r_order)
+single_mode_thermal_line(qe_input, qe_dyn, modes=[3,4,5])
 
