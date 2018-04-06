@@ -80,6 +80,9 @@ class supercell():
         qe_s.atoms = self.atoms_input(self.new_atoms)
         qe_s.control['prefix'] = qe.control['prefix'][:-1]+"_s'"
         qe_s.system['ibrav']=0
+        qe_s.system['celldm(1)']    = None
+        qe_s.system['celldm(2)']    = None
+        qe_s.system['celldm(3)']    = None
         qe_s.atomic_pos_type = 'bohr'
         qe_s.cell_units      = 'bohr'
         qe_s.cell_parameters = new_latvec

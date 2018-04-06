@@ -26,7 +26,7 @@ setup(
         ]
     },
     include_package_data=True,
-    install_requires=['numpy>1.8,<1.10'],
+    install_requires=['numpy>1.10'],
     license="GNU General Public License v3",
     zip_safe=False,
     keywords='QEplayground',
