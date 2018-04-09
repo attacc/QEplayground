@@ -1,0 +1,23 @@
+
+     Program DYNMAT v.6.1 (svn rev. 13369) starts on  9Apr2018 at 10:43:34 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI), running on     1 processors
+
+     Reading Dynamical Matrix from file bn.dynG6
+     ...Force constants read
+
+     DYNMAT       :     0.00s CPU         0.00s WALL
+
+
+   This run was terminated on:  10:43:34   9Apr2018            
+
+=------------------------------------------------------------------------------=
+   JOB DONE.
+=------------------------------------------------------------------------------=
