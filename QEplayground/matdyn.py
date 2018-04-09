@@ -112,7 +112,7 @@ class Matdyn():
         self.eig     = np.array(eig)
         self.eiv     = np.array(eiv).reshape(nqpoints,self.nmodes,self.nmodes)
 
-    def write_modes(self,filename=None):
+    def write_modes(self,filename=None, wmode='w'):
         """
         save the phonon modes in a file
         """
@@ -129,10 +129,9 @@ class Matdyn():
                     xi,yi,zi = mode[a*3:(a+1)*3].imag
                     s += ("( "+"%12.6lf "*6+')\n')%(xr,xi,yr,yi,zr,zi)
             s += "*"*81+"\n"
-            s += "\n\n"
 
         if filename:
-            f = open(filename,'w')
+            f = open(filename, wmode)
             f.write(s)
             f.close()
         else:

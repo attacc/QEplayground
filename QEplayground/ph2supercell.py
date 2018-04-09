@@ -18,7 +18,7 @@ class map_phonons():
         self.q_grid  =q_grid
         print(" \n\n\n * * * Map phonons in a supercell * * *\n")
         print(" WARNING! This code works only without symmetries!!! nosym=.true. and noinv=.true. \n")
-    
+
     def build_mapping(self):
         self.n_qpoints=self.q_grid[0]*self.q_grid[1]*self.q_grid[2]
         print(" Q grid "+str(self.q_grid))
