@@ -4,9 +4,10 @@
 # All rights reserved.
 #
 #
-#
 from itertools import product
-
+from QEplayground.pwscf  import *
+from QEplayground.matdyn import *
+from QEplayground.supercell import *
 
 class map_phonons():
     """
@@ -27,4 +28,14 @@ class map_phonons():
         if(self.qe_dyn.nqpoints != self.n_qpoints):
             print("\n ERROR! number of q-points in matdyn.modes different from the input q-grid!! \n")
             exit(0)
+
+        superc=supercell(self.qe_input,R=self.q_grid,mode='diagonal')
+        self.qe_s=superc.write()
+        self.qe_s.write(self.qe_input.filename+"_supercell")
+        self.qe_dyn_s=Matdyn(self.qe_s)
+
+
+
+
+
 
