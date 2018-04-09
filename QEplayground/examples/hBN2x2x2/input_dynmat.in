@@ -1,0 +1,5 @@
+&input
+ fildyn='bn_s.dynG1',
+ asr='crystal'
+ fileig='dynmat.eig'
+/

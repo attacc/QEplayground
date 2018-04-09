@@ -2,7 +2,7 @@
     calculation = 'scf'
     restart_mode='from_scratch',
     prefix='bn',
-    pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF',
+    pseudo_dir = '/home/claudio/SOFTWARE/PSEUDO_PWSCF',
     outdir='./'
     wf_collect=.true.
  /

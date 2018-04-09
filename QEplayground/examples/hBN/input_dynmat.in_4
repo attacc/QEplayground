@@ -1,0 +1,6 @@
+&input
+ fildyn='bn.dynG4',
+ asr='no',
+ fileig='dynmat.eig_4'
+ filout='dynmat.out_4'
+/
