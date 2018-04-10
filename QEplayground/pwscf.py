@@ -167,7 +167,10 @@ class Pwscf:
                 if match is not None:
                     cell_units = match.group(1)
                     if cell_units == "alat":
-                        scale=float(self.system['celldm(1)'])
+                        if self.system['celldm(1)'] == None:
+                            scale=np.linalg.norm(self.cell_parameters[0])
+                        else:
+                            scale=float(self.system['celldm(1)'])
                     elif cell_units == "bohr":
                         scale=1.0
                     elif cell_units == "angstrom":

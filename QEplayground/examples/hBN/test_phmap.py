@@ -11,7 +11,6 @@ q_grid=[2,2,2]
 qe_input =Pwscf(scf_filename)
 qe_dyn=Matdyn(qe_input,dynmat_filename)
 
-
 ph_map=map_phonons(qe_input, qe_dyn, q_grid)
 
 ph_map.build_mapping()
