@@ -69,8 +69,19 @@ class map_phonons():
                 for a in range(new_natoms):
                     sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:])
                     phase=np.exp(complex(0.0,1.0)*sprod*2.0*math.pi)
-#                    self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]=self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]*phase
+                    self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]=self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]*phase
 
+        #
+        # Sorf phonons
+        #
+#        sort_idx=np.argsort(self.qe_dyn_s.eig,axis=1)
+#        self.qe_dyn_s.eig=np.sort(self.qe_dyn_s.eig,axis=1)
+#        for im in range(nmodes_new):
+#            tmpself.qe_dyn_s.eiv[0,im,:]
+
+        #
+        # Write output
+        #
         self.qe_dyn_s.write_modes(filename="dynmat_supercell.out")
 
 
