@@ -1,0 +1,33 @@
+&control
+          pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF/'
+         calculation = 'scf'
+          wf_collect = .true.
+              prefix = 'lih_s'
+              outdir = './'
+/&end
+&system
+               noinv = .true.
+               ibrav = 0
+                 nat = 4
+               nosym = .true.
+             ecutwfc = 60
+                ntyp = 2
+           celldm(1) = 7.6
+/&end
+&electrons
+            conv_thr = 1.0d-12
+/&end
+CELL_PARAMETERS { alat }
+  1.0000000000   0.0000000000   1.0000000000 
+  0.5000000000   0.5000000000   0.0000000000 
+  0.0000000000   0.5000000000   0.5000000000 
+ATOMIC_SPECIES
+  Li    6.941    Li.pbe-mt_fhi.UPF
+   H  1.00794     H.pbe-mt_fhi.UPF
+ATOMIC_POSITIONS { alat }
+  H   0.0000000000   0.0000000000   0.0000000000
+ Li   0.5000000000   0.5000000000   0.5000000000
+  H   0.5000000000   0.0000000000   0.5000000000
+ Li   1.0000000000   0.5000000000   1.0000000000
+K_POINTS { automatic }
+  4  8  8  0  0  0
