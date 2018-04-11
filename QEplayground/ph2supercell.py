@@ -74,11 +74,12 @@ class map_phonons():
         #
         # Sorf phonons
         #
-#        sort_idx=np.argsort(self.qe_dyn_s.eig,axis=1)
-#        self.qe_dyn_s.eig=np.sort(self.qe_dyn_s.eig,axis=1)
-#        for im in range(nmodes_new):
-#            tmpself.qe_dyn_s.eiv[0,im,:]
-
+        sort_idx=np.argsort(self.qe_dyn_s.eig,axis=1)
+        self.qe_dyn_s.eig=np.sort(self.qe_dyn_s.eig,axis=1)
+        new_eig=np.empty_like(self.qe_dyn_s.eiv)
+        for im in range(nmodes_new):
+            new_eig[0,im,:]=self.qe_dyn_s.eiv[0,sort_idx[0][im],:]
+        self.qe_dyn_s.eiv=new_eig
         #
         # Write output
         #
