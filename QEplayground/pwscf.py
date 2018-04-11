@@ -78,6 +78,8 @@ class Pwscf:
         self.system['ecutwfc']      = float(30.0)
         self.system['force_symmorphic'] = None
         self.system['occupations']  = None
+        self.system['nosym']        = None
+        self.system['noinv']        = None
 
         self.electrons['mixing_mode']     = None
         self.electrons['mixing_beta']     = None
