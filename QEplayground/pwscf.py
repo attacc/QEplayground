@@ -167,10 +167,7 @@ class Pwscf:
                 if match is not None:
                     cell_units = match.group(1)
                     if cell_units == "alat":
-                        if self.system['celldm(1)'] == None:
-                            scale=np.linalg.norm(self.cell_parameters[0])
-                        else:
-                            scale=float(self.system['celldm(1)'])
+                        scale=float(self.system['celldm(1)'])
                     elif cell_units == "bohr":
                         scale=1.0
                     elif cell_units == "angstrom":
@@ -299,7 +296,10 @@ class Pwscf:
         if self.atomic_pos_type == "angstrom":
             scale_in = ang2au
         elif self.atomic_pos_type == "alat":
-            scale_in = float(self.system['celldm(1)'])
+            if self.system['celldm(1)'] == None:
+                scale_in=np.linalg.norm(self.cell_parameters[0])
+            else:
+                scale_in = float(self.system['celldm(1)'])
         elif self.atomic_pos_type == "crystal":
             atoms = red2car(atoms, np.array(self.cell_parameters))
 
@@ -307,7 +307,10 @@ class Pwscf:
 
         scale_out=1.0
         if units == "alat":
-            scale_out=1.0/float(self.system['celldm(1)'])
+            if self.system['celldm(1)'] == None:
+                scale_out=1.0/np.linalg.norm(self.cell_parameters[0])
+            else:
+                scale_out=1.0/float(self.system['celldm(1)'])
         elif units == "angstrom":
             scale_out=au2ang
         elif units == "crystal":

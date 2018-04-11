@@ -19,8 +19,8 @@ Author:  Claudio Attaccalite
 parser = argparse.ArgumentParser(prog='join_dynmat',description='Joint dynmat output files for different q-vectors in a single one',epilog="Copyright Claudio Attaccalite 2018")
 
 parser.add_argument('--scf' ,   type=str,  default=None)
-parser.add_argument('--out' ,   type=str,  default="joint_dynmat.out")
 parser.add_argument('--files' , nargs='*', default=None)
+parser.add_argument('--out' ,   type=str,  default="joint_dynmat.out",help="Output file name (default=joint_dynmat.out)")
 args = parser.parse_args()
 
 print("\n Joint dynmat.x output files \n\n")

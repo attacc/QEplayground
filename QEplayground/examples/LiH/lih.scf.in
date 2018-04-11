@@ -1,7 +1,7 @@
  &control
     calculation = 'scf',
-    prefix='diamond', 
-    pseudo_dir = '/home/attaccalite/SOFTWARE/PSEUDO_PWSCF/',
+    prefix='lih', 
+    pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF/',
     wf_collect=.true.,
     verbosity ='high'
  /
@@ -11,7 +11,8 @@
     nat=  2, 
     ntyp= 2, 
     ecutwfc = 60
-     
+    nosym=.true.
+    noinv=.true.
  /
  &electrons
    conv_thr = 1.0d-12
@@ -27,4 +28,4 @@ ATOMIC_POSITIONS {alat}
  H 0 0  0 
  Li 0.5 0.5  0.5 
 K_POINTS {automatic}
-  10 10 10 0 0 0
+  8 8 8 0 0 0
