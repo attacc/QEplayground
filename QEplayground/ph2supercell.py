@@ -60,16 +60,25 @@ class map_phonons():
         # 
         # Add phases to the eigenvectors
         #
-        new_atoms =self.qe_s.get_atoms(units="alat")
+        new_atoms =self.qe_s.get_atoms(units="bohr")
         new_natoms=int(self.qe_s.system["nat"])
         #
+        tpiba=2.0*math.pi/float(self.qe_input.system['celldm(1)'])
+        #
+        phases=np.zeros([n_qpoints,new_natoms],dtype=float)
+
         for iq in range(n_qpoints):
-            for im in range(nmodes_old):
+            for a in range(new_natoms):
+                sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:]*tpiba)
+                phases[iq,a]=np.real(np.exp(1j*sprod))
+                print(" Phase [q= %d, a= %d ] = %lf " % (iq,a,phases[iq,a]))
+
+
+        for im in range(nmodes_old):
+            for iq in range(n_qpoints):
                 im_q=im+iq*nmodes_old
                 for a in range(new_natoms):
-                    sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:])
-                    phase=np.real(np.exp(complex(0.0,1.0)*sprod*2.0*math.pi))
-                    self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]=self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]*phase
+                    self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]=self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]*phases[iq,a]
 
         #
         # Sorf phonons
