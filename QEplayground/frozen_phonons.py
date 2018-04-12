@@ -94,7 +94,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
 
         autosi=1.0/autime2s
-        omega=sqrt(der2/M)*autosi/(2.0*math.pi)/1e12
+        omega=math.sqrt(der2/M)*autosi/(2.0*math.pi)/1e12
 
         diff=abs(omega/(eig[0,im]/thz2cm1)*100.0-100.0)
 
