@@ -67,12 +67,16 @@ class map_phonons():
         #
         phases=np.zeros([n_qpoints,new_natoms],dtype=float)
 
+        eps=1e-5
+
         for iq in range(n_qpoints):
             for a in range(new_natoms):
                 sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:]*tpiba)
                 phases[iq,a]=np.real(np.exp(1j*sprod))
                 print(" Phase [q= %d, a= %d ] = %lf " % (iq,a,phases[iq,a]))
-
+                if iq !=0 and abs(phases[iq,a])<=eps:
+                    print("Zero phase for atom %d at q= %iq ! Please check the code! ")
+                    exit(0)
 
         for im in range(nmodes_old):
             for iq in range(n_qpoints):
