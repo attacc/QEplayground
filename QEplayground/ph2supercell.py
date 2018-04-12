@@ -63,8 +63,8 @@ class map_phonons():
         new_atoms =self.qe_s.get_atoms(units="alat")
         new_natoms=int(self.qe_s.system["nat"])
         #
-        for iq in range(1,2): #n_qpoints):
-            for im in range(4,5): #nmodes_old):
+        for iq in range(n_qpoints):
+            for im in range(nmodes_old):
                 im_q=im+iq*nmodes_old
                 for a in range(new_natoms):
                     sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:])
