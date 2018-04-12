@@ -63,12 +63,12 @@ class map_phonons():
         new_atoms =self.qe_s.get_atoms(units="alat")
         new_natoms=int(self.qe_s.system["nat"])
         #
-        for iq in range(n_qpoints):
-            for im in range(nmodes_old):
+        for iq in range(1,2): #n_qpoints):
+            for im in range(4,5): #nmodes_old):
                 im_q=im+iq*nmodes_old
                 for a in range(new_natoms):
                     sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:])
-                    phase=np.exp(complex(0.0,1.0)*sprod*2.0*math.pi)
+                    phase=np.real(np.exp(complex(0.0,1.0)*sprod*2.0*math.pi))
                     self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]=self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3]*phase
 
         #
