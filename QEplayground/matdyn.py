@@ -300,7 +300,7 @@ class Matdyn():
         masses = masses/ref_mass
 
         #check normalization
-        norm_check=True.
+        norm_check=True
         norm = np.zeros([self.nmodes])
         for nq in range(self.nqpoints):
             for n in range(self.nmodes):
