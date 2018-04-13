@@ -300,6 +300,7 @@ class Matdyn():
         masses = masses/ref_mass
 
         #check normalization
+        norm_check=True.
         norm = np.zeros([self.nmodes])
         for nq in range(self.nqpoints):
             for n in range(self.nmodes):
@@ -309,8 +310,8 @@ class Matdyn():
                     #get normalization constant
                     s += masses[a]*np.vdot(e,e).real
                 norm[n] = s
-
-        return np.isclose(norm,np.ones(self.nmodes),atol=atol).all()
+            norm_check = norm_check and np.allclose(norm,np.ones(self.nmodes),atol=atol)
+        return norm_check
 
     def __str__(self):
         s = ""
