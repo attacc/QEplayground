@@ -32,8 +32,11 @@ class map_phonons():
         #
         # Check orthogonality 
         #
-        print(self.qe_dyn.check_orthogonality())
-        exit(0)
+        if(not self.qe_dyn.check_orthogonality()):
+            print(" ERROR ERROR ERROR!! ")
+            print(" Use the dynamical matrix eigenvectors as input!! ")
+            print(" Not the one normalized with the masses!! ")
+            exit(1)
         #
         #
         # Build the supercell
@@ -100,10 +103,10 @@ class map_phonons():
             new_eig[0,im,:]=self.qe_dyn_s.eiv[0,sort_idx[0][im],:]
         self.qe_dyn_s.eiv=new_eig
         #
+        # Normalize eigevectors again
+        #
+        self.qe_dyn_s.normalize()
+        #
         # Write output
         #
         self.qe_dyn_s.write_modes(filename="dynmat_supercell.out")
-
-
-
-
