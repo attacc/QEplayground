@@ -38,7 +38,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
 
     tl_list=[]  # Thermal lines list
 
-    if(len(mode_range)>10):
+    if(len(mode_range)>10 and n_tlines == None):
         print(" WARNING! Too many modes! Number of thermal line set to 100! ")
         n_tlines=100
 
