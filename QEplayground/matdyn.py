@@ -278,6 +278,7 @@ class Matdyn():
         Check if the eigenvectors are orthogonal
         """
 
+        orth_check=True
         orth = np.zeros([self.nmodes,self.nmodes])
         for nq in range(self.nqpoints):
             for n in range(self.nmodes):
@@ -285,8 +286,8 @@ class Matdyn():
                 for m in range(self.nmodes):
                     e2 = self.eiv[nq,m]
                     orth[n,m] = np.vdot(e1,e2).real
-
-        return np.isclose(orth,np.eye(self.nmodes),atol=atol).all()
+            orth_check=orth_check and np.allclose(orth,np.eye(self.nmodes),atol=atol)
+        return orth_check
 
     def check_normalization(self,masses,atol=1e-5):
         """

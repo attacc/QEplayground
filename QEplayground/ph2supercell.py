@@ -30,6 +30,12 @@ class map_phonons():
             exit(0)
 
         #
+        # Check orthogonality 
+        #
+        print(self.qe_dyn.check_orthogonality())
+        exit(0)
+        #
+        #
         # Build the supercell
         #
         superc=supercell(self.qe_input,R=self.q_grid,mode='diagonal')
