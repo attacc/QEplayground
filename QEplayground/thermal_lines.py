@@ -38,6 +38,10 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
 
     tl_list=[]  # Thermal lines list
 
+    if(len(mode_range)>10):
+        print(" WARNING! Too many modes! Number of thermal line set to 100! ")
+        n_tlines=100
+
     if n_tlines == None:
         #
         # Generate all possible thermal lines
@@ -45,6 +49,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
         # lines_sign is a list of all possible sign combination 2^nmodes
         #
         single_mode_sign = [-1.0, 1.0]
+        #
         all_sign=product(single_mode_sign,repeat=len(mode_range))
 
         for l_sign in all_sign:
