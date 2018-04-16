@@ -13,11 +13,19 @@ from QEplayground.units  import autime2s,amu2au,thz2cm1
 import math
 
 def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
+    #
+    # Check orthogonality 
+    #
+    if(not self.qe_dyn.check_orthogonality()):
+        print(" ERROR ERROR ERROR!! ")
+        print(" Use the dynamical matrix eigenvectors as input!! ")
+        print(" Not the one normalized with the masses!! ")
+        exit(1)
 
     masses=qe_input.get_masses()
     ref_mass=max(masses)
     M       =1.0/(np.sum(np.reciprocal(masses)))
-    M       =M*float(qe_input.system['nat'])  # is this 2*number of unit cells?
+    M       =M*float(qe_input.system['nat'])
 
     string="\n\n* * * Frozen phonon calculations * * *\n\n"
     string+="Reference  mass : %12.8f \n" % ref_mass
