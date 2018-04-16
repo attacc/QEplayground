@@ -1,11 +1,9 @@
 lih_phonons
 &inputph
   tr2_ph=1.0d-12,
-  amass(1)=1.00794
-  amass(2)=6.941
   prefix='lih',
   outdir='./',
   fildyn='lih.dynG'
   ldisp=.true.
-  nq1=2, nq2=1, nq3=1
+  nq1=1, nq2=1, nq3=1
  /

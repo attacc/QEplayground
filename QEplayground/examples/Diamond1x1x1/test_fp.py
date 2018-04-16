@@ -6,7 +6,7 @@ r_order=2    # Richardson extrapolation order
 delta=0.02  # Displacement in a.u.
 
 scf_filename    ="diamond.scf.in"
-dynmat_filename ="dynmat.out"
+dynmat_filename ="diamond.eigv"
 
 qe_input =Pwscf(scf_filename)
 qe_dyn=Matdyn(qe_input,dynmat_filename)

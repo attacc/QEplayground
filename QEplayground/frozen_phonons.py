@@ -16,27 +16,25 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     #
     # Check orthogonality 
     #
-    if(not self.qe_dyn.check_orthogonality()):
+    if(not qe_dyn.check_orthogonality()):
         print(" ERROR ERROR ERROR!! ")
         print(" Use the dynamical matrix eigenvectors as input!! ")
         print(" Not the one normalized with the masses!! ")
         exit(1)
 
     masses=qe_input.get_masses()
-    ref_mass=max(masses)
-    M       =1.0/(np.sum(np.reciprocal(masses)))
-    M       =M*float(qe_input.system['nat'])
+
+    qe_dyn.normalize_with_masses(masses)
 
     string="\n\n* * * Frozen phonon calculations * * *\n\n"
-    string+="Reference  mass : %12.8f \n" % ref_mass
-    string+="Reduced    mass : %12.8f [ref_mass units]  %12.8f  [amu]\n" % (M/ref_mass,M )
+    string+="Min and max  mass : %12.8f  -  %12.8f  [amu]\n" % (min(masses),max(masses))
 
     print(string)
     ofile=open("frozen_phonons.log","w")
     ofile.write(string)
 
     # convert Mass to a.u.
-    M       =M*amu2au
+    M       =1.0*amu2au
 
     # output reader
     qe_output=Pwout(qe_input)

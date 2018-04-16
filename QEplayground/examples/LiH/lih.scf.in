@@ -11,8 +11,8 @@
     nat=  2, 
     ntyp= 2, 
     ecutwfc = 60
-    nosym=.true.
     noinv=.true.
+    nosym=.true.
  /
  &electrons
    conv_thr = 1.0d-12
@@ -25,7 +25,7 @@ ATOMIC_SPECIES
  H  1.00794     H.pbe-mt_fhi.UPF
  Li 6.941       Li.pbe-mt_fhi.UPF
 ATOMIC_POSITIONS {alat}
- H 0 0  0 
- Li 0.5 0.5  0.5 
+ H -0.25 -0.25 -0.25 
+ Li 0.25 0.25  0.25 
 K_POINTS {automatic}
-  8 8 8 0 0 0
+  4 4 4 0 0 0
