@@ -14,6 +14,9 @@ from math import *
 import numpy as np
 import copy
 from QEplayground.pwscf import Pwscf
+import fractions as frc
+from QEplayground.lattice import rec_lat
+
 
 class supercell():
     """
@@ -33,15 +36,17 @@ class supercell():
         self.latvec      = np.array(qe_input.cell_parameters)
         self.old_nat     = int(qe_input.system['nat'])
         self.atoms       = qe_input.atoms
+        self.mode        = mode
 
         #Case of nondiagonal supercell
         if mode!='diagonal':
             self.Q = np.array(R)
             print('Nondiagonal supercell')
             if (qe_input.kpoints % self.Q[1] != 0).any():
-                print('ERROR: You must set a unit cell k-point mesh where%s\
-       Nx,Ny,Nz are multiples of %d,%d,%d, respectively.'%('\n',self.Q[1,0],self.Q[1,1],self.Q[1,2])) 
-                exit()
+                print(self.Q)
+                print('ERROR: You must set a unit cell k-point mesh where Nx,Ny,Nz ')
+                print('       are multiples of %d, %d, %d, respectively.' % (self.Q[1,0],self.Q[1,1],self.Q[1,2]))
+                exit(0)
             self.R, self.new_latvec = self.find_nondiagonal()
         #Case of diagonal supercell    
         else:
@@ -49,8 +54,9 @@ class supercell():
             self.R           = R
             for i in range(3):
                 self.new_latvec[i]  = self.latvec[i]*R[i]
-            self.sup_size    = self.R[0]*self.R[1]*self.R[2]
-            self.new_atoms   = self.build_supercell()
+
+        self.sup_size    = int(self.R[0]*self.R[1]*self.R[2])
+        self.new_atoms   = self.build_supercell()
 
     def find_integers(self,nums,g23,g12,g31,g123):
         """Compute integers for off-diagonal supercell matrix elements 
@@ -64,9 +70,9 @@ class supercell():
                     p=i
                     break
          #Compute q
-        g12_r = g12/g123
-        g23_r = g23/g123
-        g31_r = g31/g123
+        g12_r = int(g12/g123)
+        g23_r = int(g23/g123)
+        g31_r = int(g31/g123)
         if g12_r == 1: q = 0
         else:
             for i in range(1,g12_r):
@@ -74,7 +80,7 @@ class supercell():
                     q=i
                     break
         #Compute r
-        gg_r = g31*g23/g123
+        gg_r = int(g31*g23/g123)
         z = g23*nums[0]/g12+g31*q*nums[1]/g12
         if gg_r == 1: r = 0
         else:
@@ -110,7 +116,7 @@ class supercell():
         #New lattice vectors and actual supercell size
         new_latvec = np.einsum('ij,jx->ix',self.S,self.latvec)
         R          = [self.S[0,0],self.S[1,1],self.S[2,2]]
-        print self.S
+        print(self.S)
         return R, new_latvec
 
     def build_supercell(self):
@@ -123,8 +129,8 @@ class supercell():
         R          = self.R
         atoms      = self.qe_input.get_atoms("bohr")
         new_atoms      = np.empty((self.sup_size*self.old_nat,3),dtype=float)
-        for nz,ny,nx in product(range(self.R[2]),range(self.R[1]),range(self.R[0])):
-            cell=nx+ny*self.R[0]+nz*self.R[0]*self.R[1]
+        for nz,ny,nx in product(range(int(self.R[2])),range(int(self.R[1])),range(int(self.R[0]))):
+            cell=nx+ny*int(self.R[0])+nz*int(self.R[0]*self.R[1])
             for b in range(self.old_nat):
                 new_atoms[cell*self.old_nat+b]=atoms[b] +nx*latvec[0] +ny*latvec[1] +nz*latvec[2]
         return new_atoms
@@ -154,12 +160,14 @@ class supercell():
             self.S_inv_T = np.linalg.inv(self.S).T
             self.new_repvec = np.einsum('ij,jx->ix',self.S_inv_T,self.repvec)
 
+    def posint(self,value):
+        return abs(int(round(value)))
 
     def write(self):
         new_latvec = self.new_latvec
         alat = self.lattice_constants(new_latvec)
         qe = self.qe_input
-        if mode=='diagonal':
+        if self.mode=='diagonal':
             #A suggestion for a consistent new kpoint mesh 
             new_kpoints = [ceil(qe.kpoints[0]/self.R[0]), ceil(qe.kpoints[1]/self.R[1]), ceil(qe.kpoints[2]/self.R[2])]
         else:
