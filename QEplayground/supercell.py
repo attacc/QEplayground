@@ -152,18 +152,23 @@ class supercell():
         """
         #Unit cell
         repvec = rec_lat(self.latvec)
-        alat=np.array(self.lattice_constants(self.latvec))
-        self.repvec = 2.*np.pi*np.multiply(1./alat,repvec)
+        alat0=self.lattice_constants(self.latvec)[0]
+        self.repvec = repvec/(2.0*np.pi/alat0)
+        print('Old lattice vectors (alat):\n'+str(self.latvec/alat0))
+        print('New lattice vectors (alat):\n'+str(self.new_latvec/alat0))
+        print('Old reciprocal lattice vectors (2 pi/alat):\n'+str(self.repvec))
         #Supercell
         if mode=='diagonal': self.new_repvec = np.array([self.repvec[i]/float(R[i]) for i in range(3)])
         else:
             self.S_inv_T = np.linalg.inv(self.S).T
             self.new_repvec = np.einsum('ij,jx->ix',self.S_inv_T,self.repvec)
+        print('New reciprocal lattice vectors (2 pi/alat):\n'+str(self.new_repvec))
 
     def posint(self,value):
         return abs(int(round(value)))
 
     def write(self):
+        R = self.R
         new_latvec = self.new_latvec
         alat = self.lattice_constants(new_latvec)
         qe = self.qe_input
