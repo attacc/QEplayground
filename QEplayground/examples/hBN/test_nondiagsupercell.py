@@ -4,7 +4,7 @@ from QEplayground.supercell  import *
 scf_filename    ="hBN.scf.in"
 qe_input =Pwscf(scf_filename)
 
-super_c = supercell(qe_input,R=[[1,1,1],[6,6,2]],mode='nondiagonal')
+super_c = supercell(qe_input,R=[[1,1,1],[6,6,1]],mode='nondiagonal')
 
 qe_s = super_c.write()
 
