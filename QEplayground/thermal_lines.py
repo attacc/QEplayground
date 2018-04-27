@@ -96,7 +96,8 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
                 new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
         ic=ic+1
 
-        qe_new.control['prefix']=qe_dyn.qe_input.control['prefix']+"_TL"+str(ic)
+        qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("'")+"_TL"+str(ic)
+        qe_new.control['prefix']="'"+qe_new.control['prefix']+"'"
 
         if not debug:
             qe_new.set_atoms(new_atoms,units="bohr")
