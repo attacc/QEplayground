@@ -63,6 +63,7 @@ class Pwscf:
         self.control['calculation']  = 'scf'
         self.control['restart_mode'] = None
         self.control['prefix']       = 'test'
+        self.control['verbosity']    = 'high'
         self.control['pseudo_dir']   = './'
         self.control['outdir']       = '\'./\''
         self.control['wf_collect']   = None

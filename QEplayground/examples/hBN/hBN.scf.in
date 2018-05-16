@@ -5,6 +5,7 @@
     pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF',
     outdir='./'
     wf_collect=.true.
+    verbosity='high'
  /
  &system    
     ibrav=  4 
@@ -12,9 +13,7 @@
     celldm(3) = 2.60 
     nat=  4
     ntyp= 2
-    ecutwfc = 50.0 
-    nosym=.true.
-    noinv=.true.
+    ecutwfc = 60.0 
  /
  &electrons
     mixing_mode = 'plain'
@@ -30,4 +29,4 @@ ATOMIC_POSITIONS crystal
  N      6.6666666666E-01  3.3333333333E-01  0.5000000000E+00
  B     -6.6666666666E-01 -3.3333333333E-01   0.5000000000E+00
 K_POINTS automatic
-6 6 1 0 0 0
+12 12 4 0 0 0
