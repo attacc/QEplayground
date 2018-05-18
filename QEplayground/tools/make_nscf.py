@@ -27,4 +27,3 @@ for QEfile in glob.glob(path):
     ofile=QEfile.replace("scf","nscf")
 
     qe_input.write(filename=ofile)
-    exit(0)
