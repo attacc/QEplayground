@@ -46,25 +46,25 @@ def second_deriv(qe_input, qe_dyn, delta, r_order=2, modes=None,T=0.0):
 
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)
-            qe_right.write(qe_input.filename+"_M"+str(im)+"_R1")
+            qe_right.write(qe_input.filename+"_M"+str(im).zfill(3)+"_R1")
 
 
         elif r_order == 2 or r_order == 3:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)
             qe_left =qe_dyn.generate_displacement(0, im, -delta)
             #
-            qe_left.write(qe_input.filename+"_M"+str(im)+"_L1")
+            qe_left.write(qe_input.filename+"_M"+str(im).zfill(3)+"_L1")
             #
-            qe_right.write(qe_input.filename+"_M"+str(im)+"_R1")
+            qe_right.write(qe_input.filename+"_M"+str(im).zfill(3)+"_R1")
 
             if r_order == 3:
                 der2_large=der2
                 qe_right=qe_dyn.generate_displacement(0, im,  delta/2.0)
                 qe_left =qe_dyn.generate_displacement(0, im, -delta/2.0)
                 #
-                qe_left.write(qe_input.filename+"_M"+str(im)+"_L2")
+                qe_left.write(qe_input.filename+"_M"+str(im).zfill(3)+"_L2")
                 #
-                qe_right.write(qe_input.filename+"_M"+str(im)+"_R2")
+                qe_right.write(qe_input.filename+"_M"+str(im).zfill(3)+"_R2")
 
     sigma_file.close()
 
