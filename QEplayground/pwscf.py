@@ -60,12 +60,12 @@ class Pwscf:
 #        print("Destroy class PwscfIn")
 
     def set_pwscf_default(self):
-        self.control['calculation']  = 'scf'
+        self.control['calculation']  = "'scf'"
         self.control['restart_mode'] = None
         self.control['prefix']       = 'test'
-        self.control['verbosity']    = 'high'
-        self.control['pseudo_dir']   = './'
-        self.control['outdir']       = '\'./\''
+        self.control['verbosity']    = "'high'"
+        self.control['pseudo_dir']   = "'./'"
+        self.control['outdir']       = "'./'"
         self.control['wf_collect']   = None
         self.control['tprnfor']      = None
 
