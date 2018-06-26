@@ -20,12 +20,12 @@ foreach file (*.scf.in_M*)
    echo " DFT inputs:  $scf and  $nscf "
    mkdir $folder
    cd $folder
-   $QE -inp ../$scf
-   $QE -inp ../$nscf
+   $QE -inp ../$scf   > output_scf 
+   $QE -inp ../$nscf  > output_nscf
    cd bn.save
-   $P2Y -N -F data-file.xml
-   $YAMBO -M -N -F $YSETUP
-   $YAMBO -M -N -F $YOPTICS
+   $P2Y -N -F data-file.xml  > output_p2y
+   $YAMBO -M -N -F $YSETUP   > output_setup
+   $YAMBO -M -N -F $YOPTICS  > output_optics
    cd ..
    cd ..
 end
