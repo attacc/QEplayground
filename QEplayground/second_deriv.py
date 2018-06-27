@@ -11,6 +11,7 @@ from QEplayground.matdyn import *
 from QEplayground.pwout  import *
 from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin
 from QEplayground.utilities import bose
+from math import sqrt
 
 import math
 
