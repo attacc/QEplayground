@@ -86,9 +86,9 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
             q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
             #
             if debug:
-                print("W and T atomic units : %12.8f, %12.8f " % (w_au,T/au2kelvin))
-                print("Amplitude at T=0     : %12.8f " % q_0)
-                print("Amplitude at finite T: %12.8f " % q_T)
+                print("W and T atomic units : %14.10f, %14.10f " % (w_au,T/au2kelvin))
+                print("Amplitude at T=0     : %14.10f " % q_0)
+                print("Amplitude at finite T: %14.10f " % q_T)
             #
             delta =q_T*im_sign
             for a in range(qe_dyn.natoms):
