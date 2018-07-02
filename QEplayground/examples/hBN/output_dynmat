@@ -1,0 +1,49 @@
+
+     Program DYNMAT v.6.1 (svn rev. 13369) starts on  2Jul2018 at 15:38:29 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI), running on     1 processors
+
+     Reading Dynamical Matrix from file bn.dynG1
+     ...Force constants read
+     ...epsilon and Z* read
+     Acoustic Sum Rule: || Z*(ASR) - Z*(orig)|| =    2.502796E-02
+     Acoustic Sum Rule: ||dyn(ASR) - dyn(orig)||=    5.470016E-03
+     A direction for q was not specified:TO-LO splitting will be absent
+
+     Polarizability (A^3 units)
+     multiply by 0.481054 for Clausius-Mossotti correction
+        10.977790    0.000000    0.000000
+        -0.000000   10.977790    0.000000
+         0.000000    0.000000    5.226636
+
+     IR activities are in (D/A)^2/amu units
+
+# mode   [cm-1]    [THz]      IR
+    1     -0.00   -0.0000    0.0000
+    2      0.00    0.0000    0.0000
+    3      0.00    0.0000    0.0000
+    4     73.07    2.1904    0.0000
+    5     73.07    2.1904    0.0000
+    6    132.17    3.9623    0.0000
+    7    768.35   23.0346    4.6732
+    8    822.39   24.6545    0.0000
+    9   1338.19   40.1178   54.7236
+   10   1338.19   40.1178   54.7236
+   11   1338.21   40.1186    0.0000
+   12   1338.21   40.1186    0.0000
+
+     DYNMAT       :     0.01s CPU         0.01s WALL
+
+
+   This run was terminated on:  15:38:29   2Jul2018            
+
+=------------------------------------------------------------------------------=
+   JOB DONE.
+=------------------------------------------------------------------------------=

@@ -109,6 +109,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
         print(string)
         ofile.write(string)
+        exit(0)
 
     ofile.close()
 
