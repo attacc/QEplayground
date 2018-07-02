@@ -23,6 +23,11 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
     masses     = qe_dyn.qe_input.get_masses()
     #
+    # Initialize random number
+    #
+    random.seed(a=100)
+    #
+    #
     # Check ortogonaly of the phonon eigenvectors
     # 
     if not qe_dyn.check_orthogonality():
