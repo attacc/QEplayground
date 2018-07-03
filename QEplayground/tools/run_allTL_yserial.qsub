@@ -1,0 +1,56 @@
+#/bin/csh -f
+
+# Variables d'environnement SGE
+#$ -S /bin/csh
+#$ -cwd
+#$ -j y
+#$ -pe qlogic 12
+#$ -q ib4.q
+
+setenv OMP_NUM_THREADS 1
+setenv NUM_MPI `expr ${NSLOTS} / ${OMP_NUM_THREADS}`
+
+echo ""
+echo "Total number of cores $NSLOTS"
+echo "Run with $OMP_NUM_THREADS threads/process"
+echo "Run with $NUM_MPI mpi processes"
+echo ""
+
+
+setenv YAMBO /home/attaccalite/SOFTWARE/yambo-devel/bin/yambo
+setenv P2Y   /home/attaccalite/SOFTWARE/yambo-devel/bin/p2y
+setenv QE    /home/attaccalite/SOFTWARE/qe-6.1/bin/pw.x
+setenv MPIRUN "mpirun -env OMP_NUM_THREADS $OMP_NUM_THREADS -np $NUM_MPI" 
+setenv MPIRUN0 "mpirun -env OMP_NUM_THREADS  $OMP_NUM_THREADS -np 1" 
+set pool = 2
+
+# setenv MPIRUN 
+# setenv QE /home/attacc/SOFTWARE/qe-6.1/bin/pw.x
+# setenv YAMBO /home/attacc/SOFTWARE/yambo-devel/bin/yambo
+# setenv P2Y   /home/attacc/SOFTWARE/yambo-devel/bin/p2y
+# set pool = 1
+
+set ntl  = 40
+
+set j = 21
+while ( $j <= $ntl )
+   echo "QE calculation for the $j thermal-line"
+   echo "  scf file:  hBN.supercell.scf.in_TL$j "
+   echo " nscf file:  hBN.supercell.nscf.in_TL$j "
+   mkdir TL$j
+   cd TL$j
+   ${MPIRUN} ${QE} -npool $pool -inp ../hBN.supercellx2.scf.in_TL$j  > output_scf 
+   ${MPIRUN} ${QE} -npool $pool -inp ../hBN.supercellx2.nscf.in_TL$j > output_nscf
+   cd bn_s_TL$j.save
+   ${P2Y} -N -F data-file.xml > output_p2y
+   rm -rf K00*
+   ${YAMBO} -M -F        ../../yambo.in_setup > output
+   ${MPIRUN0} ${YAMBO} -F ../../yambo.in_bse -J TL$j > output
+   rm -rf SAVE TL$j
+   cd ..
+   cd ..
+   @ j++
+end
+
+
+
