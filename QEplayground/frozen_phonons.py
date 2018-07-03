@@ -23,7 +23,6 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
         exit(1)
 
     masses=qe_input.get_masses()
-
     qe_dyn.normalize_with_masses(masses)
 
     string="\n\n* * * Frozen phonon calculations * * *\n\n"
@@ -33,8 +32,11 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     ofile=open("frozen_phonons.log","w")
     ofile.write(string)
 
-    # convert Mass to a.u.
-    M       =1.0*amu2au
+    # fictitious mass
+    M       =1.0
+
+    # Rescale delta because masses are in amu
+    delta=delta/math.sqrt(amu2au)
 
     # output reader
     qe_output=Pwout(qe_input)
@@ -109,7 +111,6 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
         print(string)
         ofile.write(string)
-        exit(0)
 
     ofile.close()
 

@@ -13,8 +13,8 @@ eps_name="o.eps_q1_ip"
 noph_folder="NOPH"
 prefix="bn"
 sigma_fname="sigma.dat"
-#delta=0.5
-delta=41.68640593/sqrt(amu2au)
+delta=1.0
+#delta=41.68640593/sqrt(amu2au)
 
 sigma_file=open(sigma_fname,'r')
 
@@ -43,7 +43,7 @@ for mode,sigma2 in zip(modes[:,0],modes[:,1]):
     eps_r=np.genfromtxt(os.path.join(folder_r,eps_name))
 
     eps_snd_der=(eps_r+eps_l-2.0*eps_noph)/(delta**2)/amu2au
-    eps_snd_der=eps_snd_der*sigma2
+    eps_snd_der=eps_snd_der*sigma2/2.0  # 2 comes from Taylor expantion f''/2 * q^2
     eps_snd_der[:,0]=eps_noph[:,0] # restore energy line
 
     np.savetxt("eps_der_"+str(mode)+".dat",eps_snd_der)
