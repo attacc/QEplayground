@@ -34,7 +34,7 @@ def second_deriv(qe_input, qe_dyn, delta, r_order=2, modes=None,T=0.0):
         modes = range(3, qe_dyn.nmodes) #skyp acustic modes at q=0
 
     sigma_file=open("sigma.dat","w")
-    sigma_file.write("# mode sigma^2\n")
+    sigma_file.write("# mode sigma[nb] sigma[nb+1]  w_b[eV] \n")
 
     for im in modes:
         print(" Calculating mode %d .... " % (im+1))
@@ -46,7 +46,7 @@ def second_deriv(qe_input, qe_dyn, delta, r_order=2, modes=None,T=0.0):
         sigma1=q_T1**2
         sigma2=q_T2**2
 
-        sigma_file.write(str(im).zfill(3)+", "+str(sigma1)+", "str(sigma2)+", "+str(w_au*au2ev)+"\n")
+        sigma_file.write(str(im).zfill(3)+", "+str(sigma1)+", "+str(sigma2)+", "+str(w_au*au2ev)+"\n")
 
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)
