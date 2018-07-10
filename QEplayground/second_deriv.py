@@ -9,7 +9,7 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
-from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin
+from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin,au2ev
 from QEplayground.utilities import bose
 from math import sqrt
 
@@ -40,11 +40,13 @@ def second_deriv(qe_input, qe_dyn, delta, r_order=2, modes=None,T=0.0):
         print(" Calculating mode %d .... " % (im+1))
         w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
         q_0  = 1.0/math.sqrt(2.0*w_au)
-        q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
+        q_T1  = q_0*math.sqrt(bose(w_au,T/au2kelvin))
+        q_T2  = q_0*math.sqrt(1.0+bose(w_au,T/au2kelvin))
 
-        sigma=q_T**2
+        sigma1=q_T1**2
+        sigma2=q_T2**2
 
-        sigma_file.write(str(im).zfill(3)+", "+str(sigma)+"\n")
+        sigma_file.write(str(im).zfill(3)+", "+str(sigma1)+", "str(sigma2)+", "+str(w_au*au2ev)+"\n")
 
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)

@@ -1,0 +1,58 @@
+#/bin/csh -f
+# Variables d'environnement SGE
+#$ -S /bin/csh
+#$ -cwd
+#$ -j y
+#$ -pe qlogic 12
+#$ -q ib4.q
+
+setenv OMP_NUM_THREADS 1
+setenv NUM_MPI `expr ${NSLOTS} / ${OMP_NUM_THREADS}`
+
+echo ""
+echo "Total number of cores $NSLOTS"
+echo "Run with $OMP_NUM_THREADS threads/process"
+echo "Run with $NUM_MPI mpi processes"
+echo ""
+
+setenv YAMBO /home/attaccalite/SOFTWARE/yambo-devel/bin/yambo
+setenv P2Y   /home/attaccalite/SOFTWARE/yambo-devel/bin/p2y
+setenv QE    /home/attaccalite/SOFTWARE/qe-6.1/bin/pw.x
+setenv MPIRUN "mpirun -env OMP_NUM_THREADS $OMP_NUM_THREADS -np $NUM_MPI" 
+setenv MPIRUN0 "mpirun -env OMP_NUM_THREADS  $OMP_NUM_THREADS -np 1" 
+setenv pool 2
+
+# setenv MPIRUN 
+# setenv QE /home/attacc/SOFTWARE/qe-6.1/bin/pw.x
+# setenv YAMBO /home/attacc/SOFTWARE/yambo-devel/bin/yambo
+# setenv P2Y   /home/attacc/SOFTWARE/yambo-devel/bin/p2y
+# set pool = 1
+
+setenv scf_name   "hBN.supercell.scf.in"
+setenv nscf_name  "hBN.supercell.nscf.in"
+
+setenv YSETUP   "../../yambo.in_setup"
+setenv YOPTICS  "../../yambo.in_bse"
+
+foreach file (*.scf.in_M*)
+   set folder = `echo $file | awk '{print substr($0,length($0)-6,7)}'`
+   if ( -d $folder) then
+     echo "Skipping folder $folder ..."
+   endif
+   set scf  = "${scf_name}_${folder}"
+   set nscf = "${nscf_name}_${folder}"
+   echo " DFT inputs:  $scf and  $nscf "
+   mkdir $folder
+   cd $folder
+   ${MPIRUN} ${QE} -npool $pool -inp ../$scf   > output_scf
+   ${MPIRUN} ${QE} -npool $pool -inp ../$nscf  > output_nscf
+   cd bn_s.save
+   $P2Y -N -F data-file.xml  > output_p2y
+   rm -rf K00*
+   echo "$YAMBO -M -F $YSETUP"
+   $YAMBO -M -F $YSETUP   > output_setup
+   ${MPIRUN0} $YAMBO -F $YOPTICS  > output_optics
+   rm -rf SAVE 
+   cd ..
+   cd ..
+end

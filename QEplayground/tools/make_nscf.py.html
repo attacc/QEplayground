@@ -1,0 +1,38 @@
+<html><head>
+<title>/home/attacc/SOFTWARE/QEplayground/QEplayground/tools/make_nscf.py</title>
+<meta name="Generator" content="htmlizer/[twisted, version 16.0.0]" />
+<link rel="alternate" href="/home/attacc/SOFTWARE/QEplayground/QEplayground/tools/make_nscf.py" type="text/x-python" />
+
+</head>
+<body>
+<pre><span class="py-src-comment">#!/usr/bin/python3</span>
+<span class="py-src-comment">#</span>
+<span class="py-src-comment"># Copyright (c) 2018, E. Cannuccia and C. Attaccalite</span>
+<span class="py-src-comment"># All rights reserved.</span>
+<span class="py-src-comment">#</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">glob</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">QEplayground</span>.<span class="py-src-variable">pwscf</span>  <span class="py-src-keyword">import</span> *
+
+<span class="py-src-variable">path</span>=<span class="py-src-string">'hBN.supercell.scf.in_TL*'</span>
+
+<span class="py-src-keyword">for</span> <span class="py-src-variable">QEfile</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">glob</span>.<span class="py-src-variable">glob</span>(<span class="py-src-variable">path</span>):
+    <span class="py-src-variable">qe_input</span> =<span class="py-src-variable">Pwscf</span>(<span class="py-src-variable">QEfile</span>)
+    <span class="py-src-comment">#</span>
+    <span class="py-src-comment"># Setupt the NSCF</span>
+    <span class="py-src-comment">#</span>
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">control</span>[<span class="py-src-string">'restart_mode'</span>]=<span class="py-src-variable">None</span>
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">control</span>[<span class="py-src-string">'calculation'</span>]=<span class="py-src-string">'nscf'</span>
+
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">system</span>[<span class="py-src-string">'nbnd'</span>]=<span class="py-src-number">240</span>
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">system</span>[<span class="py-src-string">'force_symmorphic'</span>]=<span class="py-src-string">'.true.'</span>
+
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">electrons</span>[<span class="py-src-string">'mixing_beta'</span>]=<span class="py-src-variable">None</span>
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">electrons</span>[<span class="py-src-string">'mixing_mode'</span>]=<span class="py-src-variable">None</span>
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">electrons</span>[<span class="py-src-string">'conv_thr'</span>]   =<span class="py-src-variable">None</span>
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">electrons</span>[<span class="py-src-string">'diago_thr_init'</span>]=<span class="py-src-string">'1e-6'</span>
+
+    <span class="py-src-variable">ofile</span>=<span class="py-src-variable">QEfile</span>.<span class="py-src-variable">replace</span>(<span class="py-src-string">"scf"</span>,<span class="py-src-string">"nscf"</span>)
+
+    <span class="py-src-variable">qe_input</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">filename</span>=<span class="py-src-variable">ofile</span>)
+</pre>
+</body>

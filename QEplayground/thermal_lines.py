@@ -23,6 +23,11 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
     masses     = qe_dyn.qe_input.get_masses()
     #
+    # Initialize random number
+    #
+    random.seed(a=100)
+    #
+    #
     # Check ortogonaly of the phonon eigenvectors
     # 
     if not qe_dyn.check_orthogonality():
@@ -73,6 +78,13 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
         print("\n\n Themal lines \n")
 
     ic=0
+    #
+    # Normalize with masses
+    #
+    masses=qe_dyn.qe_input.get_masses()
+    qe_dyn.normalize_with_masses(masses)
+    #
+    #
     for tl_line in tl_list:
         new_atoms  = atoms.copy()
         for im,im_sign in zip(mode_range,tl_line):
@@ -93,7 +105,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
             delta =q_T*im_sign
             for a in range(qe_dyn.natoms):
                 e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
-                new_atoms[a][:]=new_atoms[a][:]+e.real*delta/np.sqrt(masses[a]*amu2au)
+                new_atoms[a][:]=new_atoms[a][:]+e.real*delta/math.sqrt(amu2au) #/np.sqrt(masses[a]*amu2au)
         ic=ic+1
 
         qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("'")+"_TL"+str(ic)
