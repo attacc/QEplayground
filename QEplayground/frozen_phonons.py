@@ -45,7 +45,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
     #Equilibrium calculation
     folder="EQUIL"
-    qe_input.run(scf_filename,folder)
+#    qe_input.run(scf_filename,folder)
     qe_output.read_output(scf_filename+".log", path=folder)
     en_equil=qe_output.tot_energy
 
