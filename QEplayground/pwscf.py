@@ -46,19 +46,23 @@ class Pwscf:
         self._nprocs  =nprocs
         self._nthreads=nthreads
         self._npool   =npool
-        #
-        # Check if PW exist
-        #
-        file=pathlib.Path(pw)
-        if not file.exists():
-            print("Error: pw.x not found! ")
-            exit(0)
 
     def run(self,filename,folder='.'):
         """ this function is used to run this job locally
         """
+        #
+        # Check if PW exist
+        #
+        pw_file=pathlib.Path(self._pw)
+        if not pw_file.exists():
+            print("Error: pw.x not found! ")
+            exit(0)
+        #
+        # Run the job
+        #
         self.write(filename,folder=folder)
         pwjob="%s -npool %d  -inp %s > %s.log" % (self._pw,self._npool,filename,filename)
+        print(pwjob)
         if self._nprocs == 1:
             subprocess.call('OMP_NUM_THREADS=%d %s' % (self._nthreads,pwjob),shell=True, cwd=folder)
         else:

@@ -11,6 +11,7 @@ from QEplayground.matdyn import *
 from QEplayground.pwout  import *
 from QEplayground.units  import autime2s,amu2au,thz2cm1
 import math
+import pathlib
 
 def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     #
@@ -33,10 +34,10 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     ofile.write(string)
 
     # fictitious mass
-    M       =1.0
+    M       =amu2au #1.0
 
     # Rescale delta because masses are in amu
-    delta=delta/math.sqrt(amu2au)
+    delta=delta
 
     # output reader
     qe_output=Pwout(qe_input)
@@ -44,8 +45,13 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     scf_filename="scf.in"
 
     #Equilibrium calculation
+    
     folder="EQUIL"
-#    qe_input.run(scf_filename,folder)
+    if pathlib.Path(folder).exists():
+        print("WARNING! EQUIL folder exists, skipping equilibrium calculation ")
+    else:
+        qe_input.run(scf_filename,folder)
+
     qe_output.read_output(scf_filename+".log", path=folder)
     en_equil=qe_output.tot_energy
 
