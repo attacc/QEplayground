@@ -11,6 +11,7 @@ import sys
 import numpy as np
 import re
 import subprocess
+import pathlib
 
 
 class Pwscf:
@@ -45,6 +46,13 @@ class Pwscf:
         self._nprocs  =nprocs
         self._nthreads=nthreads
         self._npool   =npool
+        #
+        # Check if PW exist
+        #
+        file=pathlib.Path(pw)
+        if not file.exists():
+            print("Error: pw.x not found! ")
+            exit(0)
 
     def run(self,filename,folder='.'):
         """ this function is used to run this job locally
