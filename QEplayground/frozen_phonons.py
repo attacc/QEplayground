@@ -65,6 +65,9 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
     for im in modes:
         print(" Calculating mode %d .... " % (im+1))
+        w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+        q_0  = 1.0/math.sqrt(2.0*w_au)
+        print("Mode Amplitude at T=0     : %14.10f  a.u." % q_0)
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)
             folder="RIGHT_"+str(im)
