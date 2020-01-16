@@ -61,11 +61,14 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     if modes == None:
         modes = range(3, qe_dyn.nmodes) #skyp acustic modes at q=0
 
+    print("\nNumber of modes "+str(len(modes))+"\n")
+
     for im in modes:
         print(" Calculating mode %d .... " % (im+1))
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)
             folder="RIGHT_"+str(im)
+            #
             qe_right.run(scf_filename,folder)
             qe_output.read_output(scf_filename+".log", folder)
             en_right=qe_output.tot_energy
