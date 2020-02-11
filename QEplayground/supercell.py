@@ -178,8 +178,12 @@ class supercell():
         else:
             #The compulsory new kpoint mesh - (sub)multiples of it are also fine but not consistent
             self.reciprocal('nondiagonal')
-            new_kpoints = np.dot(self.S_inv_T.T,np.array(qe.kpoints))
+            new_kpoints = []
+            new_kpoints[0] = self.posint(qe.kpoints[0])*np.linalg.norm(self.new_repvec[0])/np.linalg.norm(self.repvec[0])
+            new_kpoints[1] = self.posint(qe.kpoints[1])*np.linalg.norm(self.new_repvec[1])/np.linalg.norm(self.repvec[1])
+            new_kpoints[2] = self.posint(qe.kpoints[2])*np.linalg.norm(self.new_repvec[2])/np.linalg.norm(self.repvec[2])
             new_kpoints = [self.posint(new_kpoints[0]),self.posint(new_kpoints[1]),self.posint(new_kpoints[2])]
+
 
         qe_s = copy.deepcopy(qe)
         qe_s.system['nat'] = self.old_nat*self.sup_size

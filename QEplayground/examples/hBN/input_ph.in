@@ -5,5 +5,5 @@ bn_phonons
   outdir='./',
   fildyn='bn.dynG'
   ldisp=.true.
-  nq1=2, nq2=2, nq3=2
+  nq1=1, nq2=1, nq3=1
  /
