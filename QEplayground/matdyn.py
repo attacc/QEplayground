@@ -212,6 +212,7 @@ class Matdyn():
         plt.show()
 
     def get_phonon_freq(self,nq,n,unit="eV"):
+        from QEplayground.units import cm1toeV,eV2ha,cm12Thz
         """
         Get the value of the phonon frequency
         nq -> q-point from where to get the frequency from

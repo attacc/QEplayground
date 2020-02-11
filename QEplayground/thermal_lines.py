@@ -119,4 +119,68 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
             print(new_atoms)
 
 
+def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", mode_range=None, debug=None):
 
+    atoms      = qe_dyn.qe_input.get_atoms("bohr")
+    new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
+    masses     = qe_dyn.qe_input.get_masses()
+    #
+    #
+    # Check ortogonaly of the phonon eigenvectors
+    # 
+    if not qe_dyn.check_orthogonality():
+        print("Error phonon eigenvectors not orthogonal!!! ")
+        exit(0)
+    #
+    # Folder name with temperature
+    #
+    folder=folder+str(T)+"K"
+    #
+    if mode_range == None:
+        mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
+
+    qe_new=copy.deepcopy(qe_dyn.qe_input)
+
+    ic=0
+    #
+    # Normalize with masses
+    #
+    masses=qe_dyn.qe_input.get_masses()
+    qe_dyn.normalize_with_masses(masses)
+    #
+    #
+    new_atoms  = atoms.copy()
+    for im in mode_range:
+       #
+       # Gaussian width
+       #
+       # see Eq. 12 of arXiv:1512.06377v1
+       #
+       w_au = qe_dyn.get_phonon_freq(0,im+1,unit='Ha')
+       q_0  = 1.0/math.sqrt(2.0*w_au)
+       q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
+       #
+       if debug:
+          print("W and T atomic units : %14.10f, %14.10f " % (w_au,T/au2kelvin))
+          print("W in cm-1 %14.10f " % qe_dyn.get_phonon_freq(0,im+1,unit='cm-1'))
+          print("Amplitude at T=0     : %14.10f " % q_0)
+          print("Amplitude at finite T: %14.10f " % q_T)
+       #
+       if (im % 2 ) ==0:
+           delta =q_T
+       else:
+           delta =-q_T
+
+       for a in range(qe_dyn.natoms):
+           e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
+           new_atoms[a][:]=new_atoms[a][:]+e.real*delta/math.sqrt(amu2au) #/np.sqrt(masses[a]*amu2au)
+        
+       qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("'")+"_ZG"
+       qe_new.control['prefix']="'"+qe_new.control['prefix']+"'"
+
+       if not debug:
+          qe_new.set_atoms(new_atoms,units="bohr")
+          qe_new.write(qe_dyn.qe_input.filename+"_ZG",folder)
+       else:
+          print("ZG line: ")
+          print(new_atoms)
