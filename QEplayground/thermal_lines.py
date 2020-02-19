@@ -93,7 +93,8 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
             #
             # see Eq. 12 of arXiv:1512.06377v1
             #
-            w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+#           w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+            w_au = qe_dyn.get_phonon_freq(0,im+1,unit='Ha')
             q_0  = 1.0/math.sqrt(2.0*w_au)
             q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
             #
