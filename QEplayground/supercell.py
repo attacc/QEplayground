@@ -204,7 +204,7 @@ class supercell():
 
         qe_s.atomic_pos_type   = 'bohr'
         qe_s.cell_parameters = new_latvec
-        qe_s.convert_atoms(qe.atomic_pos_type)
+        qe_s.convert_atoms(qe_s.atomic_pos_type)
         #Just a suggestion for the new bands
         if qe.system['nbnd'] != None: qe_s.system['nbnd'] = self.sup_size*int(qe.system['nbnd'])
         qe_s.kpoints = new_kpoints
