@@ -202,6 +202,14 @@ class Pwscf:
             self.cell_parameters = [[ -a/2,   0, a/2],
                                     [    0, a/2, a/2],
                                     [ -a/2, a/2,   0]]
+        elif ibrav == 8:
+            a   = float(self.system['celldm(1)'])
+            b   = float(self.system['celldm(2)'])
+            c   = float(self.system['celldm(3)'])
+            self.cell_parameters = [[   a,          0,     0],
+                                    [   0,        b*a,     0],
+                                    [   0,          0,   c*a]]
+
         else:
             print('ibrav = %d not implemented'%ibrav)
             exit(1)
