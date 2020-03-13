@@ -49,7 +49,7 @@ class Pwout:
         #
         # Now reads the XML
         #
-        prefix=self.qe_input.control['prefix'].strip('\'')
+        prefix=self.qe_input.control['prefix'].strip('\'').strip("\"").strip("'")
         self.qe_xml=PwXML(prefix=prefix,path=path)
   
     def get_dft_energy(self, kp, band):

@@ -50,7 +50,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     ifirst=0
     for im in range(qe_dyn.nmodes):
         e_ph=qe_dyn.get_phonon_freq(0,im+1,unit='cm-1')
-        print(" Mode %d energy %f cutoff %f " % (im,e_ph,qe_dyn.cutoff_ph))
+        #print(" Mode %d energy %f cutoff %f " % (im,e_ph,qe_dyn.cutoff_ph))
         if e_ph < qe_dyn.cutoff_ph:
             ifirst=im+1
 
