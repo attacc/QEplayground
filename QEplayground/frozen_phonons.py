@@ -44,6 +44,22 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
     scf_filename="scf.in"
 
+    # DFTP results
+    eig = np.array(qe_dyn.eig)
+
+    ifirst=0
+    for im in range(qe_dyn.nmodes):
+        e_ph=qe_dyn.get_phonon_freq(0,im+1,unit='cm-1')
+        print(" Mode %d energy %f cutoff %f " % (im,e_ph,qe_dyn.cutoff_ph))
+        if e_ph < qe_dyn.cutoff_ph:
+            ifirst=im+1
+
+    modes = range(ifirst, qe_dyn.nmodes) #skip modes with energy less than cutoff_ph
+
+    print("\nFirst mode     : "+str(ifirst+1))
+    print("Number of modes: "+str(len(modes))+"\n")
+    exit(0)
+
     #Equilibrium calculation
     
     folder="EQUIL"
@@ -55,14 +71,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     qe_output.read_output(scf_filename+".log", path=folder)
     en_equil=qe_output.tot_energy
 
-    # DFTP results
-    eig = np.array(qe_dyn.eig)
-
-    if modes == None:
-        modes = range(3, qe_dyn.nmodes) #skyp acustic modes at q=0
-
-    print("\nNumber of modes "+str(len(modes))+"\n")
-
+    # Calculations....
     for im in modes:
         print(" Calculating mode %d .... " % (im+1))
         w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12

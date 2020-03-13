@@ -59,7 +59,7 @@ class Matdyn():
     Class to read and plot the data from matdyn.modes files 
     """
 
-    def __init__(self,qe_input, filename=None):
+    def __init__(self,qe_input, filename=None, cutoff_ph=100.0):
         """
         natoms is to be removed, but for now is left for legacy purposes
         """
@@ -67,6 +67,9 @@ class Matdyn():
         self.filename = filename
         self.natoms     = int(qe_input.system['nat'])
         self.nmodes     = 3*int(self.natoms)
+        self.cutoff_ph  = cutoff_ph # cutoff_ph on phonon energy, default 100 cm-1
+
+
         if(filename != None):
             self.read_modes(filename)
 

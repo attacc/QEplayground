@@ -39,7 +39,15 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=
     folder=folder+str(T)+"K"
     #
     if mode_range == None:
-        mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
+        ifirst=0
+        for im in range(qe_dyn.nmodes):
+            e_ph=qe_dyn.get_phonon_freq(0,im+1,unit='cm-1')
+            print(" Mode %d energy %f cutoff %f " % (im,e_ph,qe_dyn.cutoff_ph))
+            if e_ph < qe_dyn.cutoff_ph:
+                ifirst=im+1
+        mode_range=range(ifirst, qe_dyn.nmodes) # Exclude the first 3 acustic modes
+        print("\nExcluded the first "+str(ifirst+1)+" modes.")
+
 
     tl_list=[]  # Thermal lines list
 
@@ -138,7 +146,14 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", mode_range=None, debug=None):
     folder=folder+str(T)+"K"
     #
     if mode_range == None:
-        mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
+        ifirst=0
+        for im in range(qe_dyn.nmodes):
+            e_ph=qe_dyn.get_phonon_freq(0,im+1,unit='cm-1')
+            print(" Mode %d energy %f cutoff %f " % (im,e_ph,qe_dyn.cutoff_ph))
+            if e_ph < qe_dyn.cutoff_ph:
+                ifirst=im+1
+        mode_range=range(ifirst, qe_dyn.nmodes) # Exclude the first 3 acustic modes
+        print("\nExcluded the first "+str(ifirst+1)+" modes.")
 
     qe_new=copy.deepcopy(qe_dyn.qe_input)
 
