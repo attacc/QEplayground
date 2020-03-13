@@ -15,6 +15,8 @@ from QEplayground.units import *
 from itertools import product
 import copy
 
+#matdyn class
+
 class MatdynIn():
     """
     Generate and manipulate quantum espresso input files for matdyn.x
