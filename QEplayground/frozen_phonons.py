@@ -58,7 +58,6 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
     print("\nFirst mode     : "+str(ifirst+1))
     print("Number of modes: "+str(len(modes))+"\n")
-    exit(0)
 
     #Equilibrium calculation
     
