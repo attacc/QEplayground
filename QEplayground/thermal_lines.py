@@ -47,6 +47,12 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
 
     tl_list=[]  # Thermal lines list
 
+    if freq_thr == None:
+        freq_thr = 0.4556000   # Hartree = 100 cm-1
+
+    if new_filename == None:
+        new_filename = qe_dyn.qe_input.filename  # default file name
+
     if(len(mode_range)>10 and n_tlines == None):
         print(" WARNING! Too many modes! Number of thermal line set to 100! ")
         n_tlines=100
@@ -149,6 +155,12 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
     if mode_range == None:
         mode_range=range(0, qe_dyn.nmodes) 
  
+    if freq_thr == None:
+        freq_thr = 0.4556000   # Hartree = 100 cm-1
+
+    if new_filename == None:
+        new_filename = qe_dyn.qe_input.filename  # default file name
+
     qe_new=copy.deepcopy(qe_dyn.qe_input)
 
     ic=0
