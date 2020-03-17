@@ -269,7 +269,7 @@ class Pwscf:
                     #read number of kpoints
                     nkpoints = int(next(lines).split()[0])
                     self.klist = []
-                    self.ktype = ""
+                    self.ktype = line.lower().strip()
                     try:
                         lines_list = list(lines)
                         for n in range(nkpoints):
