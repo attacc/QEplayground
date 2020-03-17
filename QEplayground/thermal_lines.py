@@ -48,7 +48,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     tl_list=[]  # Thermal lines list
 
     if freq_thr == None:
-        freq_thr = 0.4556000   # Hartree = 100 cm-1
+        freq_thr = 0.0004556  # Hartree = 100 cm-1
 
     if new_filename == None:
         new_filename = qe_dyn.qe_input.filename  # default file name
@@ -156,7 +156,7 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
         mode_range=range(0, qe_dyn.nmodes) 
  
     if freq_thr == None:
-        freq_thr = 0.4556000   # Hartree = 100 cm-1
+        freq_thr = 0.0004556   # Hartree = 100 cm-1
 
     if new_filename == None:
         new_filename = qe_dyn.qe_input.filename  # default file name
