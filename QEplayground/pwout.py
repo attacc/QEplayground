@@ -23,7 +23,10 @@ class Pwout:
         """
         read QE output
         """
-        f = open(path+"/"+filename,'r')
+        if path==".":
+            f = open(filename,'r')
+        else:
+            f = open(path+"/"+filename,'r')
         pw_output = f.readlines()
         f.close()
 
@@ -49,7 +52,7 @@ class Pwout:
         #
         # Now reads the XML
         #
-        prefix=self.qe_input.control['prefix'].strip('\'').strip("\"").strip("'")
+        prefix=self.qe_input.control['prefix'].strip('\'')
         self.qe_xml=PwXML(prefix=prefix,path=path)
   
     def get_dft_energy(self, kp, band):

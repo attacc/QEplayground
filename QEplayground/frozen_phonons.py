@@ -44,21 +44,6 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
 
     scf_filename="scf.in"
 
-    # DFTP results
-    eig = np.array(qe_dyn.eig)
-
-    ifirst=0
-    for im in range(qe_dyn.nmodes):
-        e_ph=qe_dyn.get_phonon_freq(0,im+1,unit='cm-1')
-        #print(" Mode %d energy %f cutoff %f " % (im,e_ph,qe_dyn.cutoff_ph))
-        if e_ph < qe_dyn.cutoff_ph:
-            ifirst=im+1
-
-    modes = range(ifirst, qe_dyn.nmodes) #skip modes with energy less than cutoff_ph
-
-    print("\nFirst mode     : "+str(ifirst+1))
-    print("Number of modes: "+str(len(modes))+"\n")
-
     #Equilibrium calculation
     
     folder="EQUIL"
@@ -70,11 +55,21 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     qe_output.read_output(scf_filename+".log", path=folder)
     en_equil=qe_output.tot_energy
 
-    # Calculations....
+    # DFTP results
+    eig = np.array(qe_dyn.eig)
+
+    if modes == None:
+        modes = range(qe_dyn.nmodes)  # PIERRE : added a threshold on the frequency instead of skippping the first 3
+
+    print("\nNumber of modes "+str(len(modes))+"\n")
+
     for im in modes:
         print(" Calculating mode %d .... " % (im+1))
         w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-        q_0  = 1.0/math.sqrt(2.0*w_au)
+        if w_au > 1e-6:
+            q_0  = 1.0/math.sqrt(2.0*w_au)
+        else:
+            continue
         print("Mode Amplitude at T=0     : %14.10f  a.u." % q_0)
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)

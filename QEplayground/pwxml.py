@@ -88,6 +88,8 @@ class PwXML():
         #get fermi
         self.fermi = float(self.datafile_xml.find("BAND_STRUCTURE_INFO/FERMI_ENERGY").text)
 
+
+        
         return True 
 
     def read_datafile_schema(self,filename):
@@ -141,8 +143,14 @@ class PwXML():
         self.eigen = np.array(self.eigen)
  
         #get fermi
-        self.fermi = float(self.datafile_xml.find("output/band_structure/highestOccupiedLevel").text)
-
+        try:
+            self.fermi = float(self.datafile_xml.find("output/band_structure/highestOccupiedLevel").text)
+        except:
+            try:
+                self.fermi = float(self.datafil_xml.find("output/band_structure/fermi_energy").text)
+            except:
+                pass
+        
         return True
 
     def get_scaled_positions(self):

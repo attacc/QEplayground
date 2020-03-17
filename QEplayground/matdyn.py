@@ -15,8 +15,6 @@ from QEplayground.units import *
 from itertools import product
 import copy
 
-#matdyn class
-
 class MatdynIn():
     """
     Generate and manipulate quantum espresso input files for matdyn.x
@@ -61,7 +59,7 @@ class Matdyn():
     Class to read and plot the data from matdyn.modes files 
     """
 
-    def __init__(self,qe_input, filename=None, cutoff_ph=100.0):
+    def __init__(self,qe_input, filename=None):
         """
         natoms is to be removed, but for now is left for legacy purposes
         """
@@ -69,9 +67,6 @@ class Matdyn():
         self.filename = filename
         self.natoms     = int(qe_input.system['nat'])
         self.nmodes     = 3*int(self.natoms)
-        self.cutoff_ph  = cutoff_ph # cutoff_ph on phonon energy, default 100 cm-1
-
-
         if(filename != None):
             self.read_modes(filename)
 
@@ -93,7 +88,6 @@ class Matdyn():
         eig = []
         eiv = []
         qpoints = []
-
         #read qpoints, modes and energies
         for j in range(nqpoints):
             frec, v_frec = [], []
@@ -234,7 +228,7 @@ class Matdyn():
         else:
             raise ValueError('Unit %s not known'%unit)
 
-        return self.eig[nq][n-1]*factor
+        return( self.eig[nq][n-1]*factor)
 
     def normalize(self):
         """
@@ -279,7 +273,7 @@ class Matdyn():
                     s += masses[a]*np.vdot(e,e).real
                 self.eiv[nq,n] *= 1.0/math.sqrt(s)
 
-    def check_orthogonality(self,atol=1e-5):
+    def check_orthogonality(self,atol=1e-3):
         """
         Check if the eigenvectors are orthogonal
         """
@@ -293,7 +287,7 @@ class Matdyn():
                     e2 = self.eiv[nq,m]
                     orth[n,m] = np.vdot(e1,e2).real
             orth_check=orth_check and np.allclose(orth,np.eye(self.nmodes),atol=atol)
-        return orth_check
+        return(orth_check)
 
     def check_normalization(self,masses,atol=1e-5):
         """
@@ -317,7 +311,7 @@ class Matdyn():
                     s += masses[a]*np.vdot(e,e).real
                 norm[n] = s
             norm_check = norm_check and np.allclose(norm,np.ones(self.nmodes),atol=atol)
-        return norm_check
+        return(norm_check)
 
     def __str__(self):
         s = ""
@@ -329,7 +323,7 @@ class Matdyn():
                 for a in range(self.natoms):
                     s += ("%12.8lf "*3)%tuple(mode[a*3:(a+1)*3].real)
                     s += ("  + i ("+"%12.8lf "*3+")\n")%tuple(mode[a*3:(a+1)*3].imag)
-        return s
+        return(s)
 
 
 
@@ -350,7 +344,7 @@ class Matdyn():
             new_atoms[a][:]=atoms[a][:]+e.real*delta
 
         qe_new.set_atoms(new_atoms,units='bohr')
-        return qe_new
+        return(qe_new)
 
     def print_atoms_sigma(self, iq, imode, delta):
         #

@@ -39,7 +39,7 @@ class supercell():
         self.mode        = mode
 
         #Case of nondiagonal supercell
-        if mode!='diagonal':
+        if mode =='nondiagonal':
             self.Q = np.array(R)
             print('Nondiagonal supercell')
             if (qe_input.kpoints % self.Q[1] != 0).any():
@@ -48,7 +48,7 @@ class supercell():
                 print('       are multiples of %d, %d, %d, respectively.' % (self.Q[1,0],self.Q[1,1],self.Q[1,2]))
                 exit(0)
             self.R, self.new_latvec = self.find_nondiagonal()
-        #Case of diagonal supercell    
+        #Case of diagonal supercell
         else:
             self.new_latvec  = np.empty_like(self.latvec)
             self.R           = R
@@ -158,7 +158,7 @@ class supercell():
         print('New lattice vectors (alat):\n'+str(self.new_latvec/alat0))
         print('Old reciprocal lattice vectors (2 pi/alat):\n'+str(self.repvec))
         #Supercell
-        if mode=='diagonal': self.new_repvec = np.array([self.repvec[i]/float(R[i]) for i in range(3)])
+        if mode=='diagonal' or mode =='keep_kpoints': self.new_repvec = np.array([self.repvec[i]/float(R[i]) for i in range(3)])
         else:
             self.S_inv_T = np.linalg.inv(self.S).T
             self.new_repvec = np.einsum('ij,jx->ix',self.S_inv_T,self.repvec)
@@ -175,6 +175,8 @@ class supercell():
         if self.mode=='diagonal':
             #A suggestion for a consistent new kpoint mesh 
             new_kpoints = [ceil(qe.kpoints[0]/self.R[0]), ceil(qe.kpoints[1]/self.R[1]), ceil(qe.kpoints[2]/self.R[2])]
+        elif self.mode == 'keep_kpoints':
+            new_kpoints = qe.kpoints
         else:
             #The compulsory new kpoint mesh - (sub)multiples of it are also fine but not consistent
             self.reciprocal('nondiagonal')
@@ -188,7 +190,7 @@ class supercell():
         qe_s = copy.deepcopy(qe)
         qe_s.system['nat'] = self.old_nat*self.sup_size
         qe_s.atoms = self.atoms_input(self.new_atoms)
-        qe_s.control['prefix'] = "\""+qe.control['prefix'][:-1].strip("'").strip("\"")+"_s\""
+        qe_s.control['prefix'] = qe.control['prefix'][:-1]+f"_{R[0]}x{R[1]}x{R[2]}'"
         qe_s.system['ibrav']=0
         if qe.system['celldm(1)'] != None:
             #
@@ -204,8 +206,8 @@ class supercell():
 
         qe_s.atomic_pos_type   = 'bohr'
         qe_s.cell_parameters = new_latvec
-        qe_s.convert_atoms(qe_s.atomic_pos_type)
+        qe_s.convert_atoms(qe.atomic_pos_type)
         #Just a suggestion for the new bands
         if qe.system['nbnd'] != None: qe_s.system['nbnd'] = self.sup_size*int(qe.system['nbnd'])
         qe_s.kpoints = new_kpoints
-        return qe_s
+        return(qe_s)

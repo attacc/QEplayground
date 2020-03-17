@@ -53,11 +53,11 @@ class Pwscf:
         #
         # Check if PW exist
         #
-        pw_file=pathlib.Path(self._pw)
-        if not pw_file.exists():
-            print("Error: pw.x not found! ")
-            exit(0)
-        #
+        #pw_file=pathlib.Path(self._pw)
+        #if not pw_file.exists():
+        #    print("Error: pw.x not found! ")
+        #    exit(0)
+        
         # Run the job
         #
         self.write(filename,folder=folder)
@@ -80,6 +80,7 @@ class Pwscf:
         self.control['outdir']       = "'./'"
         self.control['wf_collect']   = None
         self.control['tprnfor']      = None
+        self.control['disk_io']      = None
 
         self.system['ibrav']        = None
         self.system['celldm(1)']    = None
@@ -91,6 +92,7 @@ class Pwscf:
         self.system['ecutwfc']      = float(30.0)
         self.system['force_symmorphic'] = None
         self.system['occupations']  = None
+        self.system['degauss']      = None
         self.system['nosym']        = None
         self.system['noinv']        = None
 
@@ -203,13 +205,12 @@ class Pwscf:
                                     [    0, a/2, a/2],
                                     [ -a/2, a/2,   0]]
         elif ibrav == 8:
-            a   = float(self.system['celldm(1)'])
-            b   = float(self.system['celldm(2)'])
-            c   = float(self.system['celldm(3)'])
-            self.cell_parameters = [[   a,          0,     0],
-                                    [   0,        b*a,     0],
-                                    [   0,          0,   c*a]]
-
+            a = float(self.system['celldm(1)'])
+            b = float(self.system['celldm(2)'])
+            c = float(self.system['celldm(3)'])
+            self.cell_parameters = [[a, 0., 0.],
+                                    [0., b*a, 0.],
+                                    [0., 0., c*a]]
         else:
             print('ibrav = %d not implemented'%ibrav)
             exit(1)
@@ -243,7 +244,7 @@ class Pwscf:
             ifile = open(filename,'r')
         except:
             print("Error opening : "+filename)
-            exit(1)
+            sys.exit(1)
 
         self.filename=filename
         self.file_lines=ifile.readlines()
