@@ -59,14 +59,17 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None):
     eig = np.array(qe_dyn.eig)
 
     if modes == None:
-        modes = range(3, qe_dyn.nmodes) #skyp acustic modes at q=0
+        modes = range(qe_dyn.nmodes)  # PIERRE : added a threshold on the frequency instead of skippping the first 3
 
     print("\nNumber of modes "+str(len(modes))+"\n")
 
     for im in modes:
         print(" Calculating mode %d .... " % (im+1))
         w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-        q_0  = 1.0/math.sqrt(2.0*w_au)
+        if w_au > 1e-6:
+            q_0  = 1.0/math.sqrt(2.0*w_au)
+        else:
+            continue
         print("Mode Amplitude at T=0     : %14.10f  a.u." % q_0)
         if r_order == 1:
             qe_right=qe_dyn.generate_displacement(0, im,  delta)

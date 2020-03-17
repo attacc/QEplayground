@@ -23,7 +23,10 @@ class Pwout:
         """
         read QE output
         """
-        f = open(path+"/"+filename,'r')
+        if path==".":
+            f = open(filename,'r')
+        else:
+            f = open(path+"/"+filename,'r')
         pw_output = f.readlines()
         f.close()
 

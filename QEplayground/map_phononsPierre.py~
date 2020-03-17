@@ -8,8 +8,9 @@ from itertools import product
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.supercell import *
+import sys
 
-class map_phonons(no_invar_ph = False):
+class map_phonons():
     """
     Map phonon in a supercell
     no_invar_ph = remove phonon modes invariant under inversion symmetry
@@ -29,7 +30,7 @@ class map_phonons(no_invar_ph = False):
 
         if(self.qe_dyn.nqpoints != n_qpoints):
             print("\n ERROR! number of q-points in matdyn.modes different from the input q-grid!! \n")
-            exit(0)
+            sys.exit(1)
 
         #
         # Check orthogonality 
@@ -38,7 +39,7 @@ class map_phonons(no_invar_ph = False):
             print(" ERROR ERROR ERROR!! ")
             print(" Use the dynamical matrix eigenvectors as input!! ")
             print(" Not the one normalized with the masses!! ")
-            exit(1)
+            sys.exit(1)
         #
         #
         # Build the supercell
@@ -47,7 +48,7 @@ class map_phonons(no_invar_ph = False):
         self.qe_s=superc.write()
         self.qe_s.write(self.qe_input.filename+"_supercell")
         print(" Supercell scf file: "+self.qe_input.filename+"_supercell")
-        self.qe_dyn_s=Matdyn(self.qe_s)
+        self.qe_dyn_s=Matdyn(self.qe_s)                                         
         #
         # Mapping the phonons
         #
@@ -59,7 +60,7 @@ class map_phonons(no_invar_ph = False):
         self.qe_dyn_s.eig     =np.zeros([1,nmodes_new])
         self.qe_dyn_s.eiv     =np.zeros([1,nmodes_new,nmodes_new],dtype=complex)
         #
-        # Copy old eivenvalues and eigenvectors (no phase yet)
+        # Copy old eivenvalues and eigenvectors (no phase yet) (phase is exp(1j*q.T) where q is 0)
         #
         for iq in range(n_qpoints):
             for im in range(nmodes_old):
@@ -84,10 +85,10 @@ class map_phonons(no_invar_ph = False):
             for a in range(new_natoms):
                 sprod=np.dot(self.qe_dyn.qpoints[iq][:],new_atoms[a][:]*tpiba)
                 phases[iq,a]=np.real(np.exp(1j*sprod))  # equivalent to cos(q*r)
-                print(" Phase [q= %d, a= %d ] = %lf " % (iq,a,phases[iq,a]))
+                print(f" Phase [q= {iq}, a= {a} ] = {phases[iq,a]} ")
                 if iq !=0 and abs(phases[iq,a])<=eps:
                     print("Zero phase for atom %d at q= %iq ! Please check the code! ")
-                    exit(0)
+                    sys.exit(1)
 
         for im in range(nmodes_old):
             for iq in range(n_qpoints):
@@ -105,7 +106,7 @@ class map_phonons(no_invar_ph = False):
             new_eig[0,im,:]=self.qe_dyn_s.eiv[0,sort_idx[0][im],:]
         self.qe_dyn_s.eiv=new_eig
         #
-        # Normalize eigevectors again
+        # Normalize eigenvectors again
         #
         self.qe_dyn_s.normalize()
         #

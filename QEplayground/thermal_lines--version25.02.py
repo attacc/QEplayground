@@ -6,9 +6,7 @@
 # Calculate thermal lines on single phonon modes or 
 # on linear combination of the different phonons
 #
-# 27/02
-# Added a threshold in phonon frequencies to discard the negative and zero frequencies
-# (replaces the excluded_freq argument in the previous version)
+
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
@@ -19,10 +17,9 @@ import math
 import random
 
 
-def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
-                           n_tlines=None, freq_thr=None, tl2_lines=True,
-                           mode_range=None, debug=None):
-    #
+def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", n_tlines=None, tl2_lines=True, mode_range=None, debug=None):
+    """ qe_dyn is an instance of Matdyn() ????
+"""
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
     masses     = qe_dyn.qe_input.get_masses()
@@ -32,7 +29,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     random.seed(a=100)
     #
     #
-    # Check orthogonality of the phonon eigenvectors
+    # Check ortogonaly of the phonon eigenvectors
     # 
     if not qe_dyn.check_orthogonality():
         print("Error phonon eigenvectors not orthogonal!!! ")
@@ -43,7 +40,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     folder=folder+str(T)+"K"
     #
     if mode_range == None:
-        mode_range=range(qe_dyn.nmodes) # Exclude the first 3 acustic modes
+        mode_range=range(3, qe_dyn.nmodes) # Exclude the first 3 acustic modes
 
     tl_list=[]  # Thermal lines list
 
@@ -65,7 +62,10 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
             tl_list.append(l_sign)
     else:
         for i in range(n_tlines):
-            l_sign=[random.choice([-1.0,1.0]) for p in range(len(mode_range))]
+            #Pierre# doable with random.choice() in only one lign
+            tmp_list=[random.randint(0,1) for p in range(len(mode_range))] 
+            l_sign = [-1.0 if x == 0 else float(x) for x in tmp_list]
+            #eg : l_signP=[random.choice(single_mode_sign) for p in range(len(mode_range))]
             tl_list.append(l_sign)
 
             if tl2_lines:
@@ -85,6 +85,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     #
     # Normalize with masses
     #
+    #Pierre# masses is already defined
     masses=qe_dyn.qe_input.get_masses()
     qe_dyn.normalize_with_masses(masses)
     #
@@ -97,15 +98,9 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
             #
             # see Eq. 12 of arXiv:1512.06377v1
             #
-            #w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
-            w_au = qe_dyn.get_phonon_freq(0,im+1,unit='Ha')
-            if w_au > freq_thr:
-                q_0  = 1.0/math.sqrt(2.0*w_au)
-                q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
-            else:
-                if debug:
-                    print(f"Frequency ignored :  {w_au}")
-                continue
+            w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12
+            q_0  = 1.0/math.sqrt(2.0*w_au)
+            q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
             #
             if debug:
                 print("W and T atomic units : %14.10f, %14.10f " % (w_au,T/au2kelvin))
@@ -123,14 +118,18 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
 
         if not debug:
             qe_new.set_atoms(new_atoms,units="bohr")
-            qe_new.write(new_filename+"_TL"+str(ic),folder)
+            qe_new.write(qe_dyn.qe_input.filename+"_TL"+str(ic),folder)
         else:
             print("Thermal line: %d " %(ic))
             print(new_atoms)
 
 
-def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = None, mode_range=None, debug=None):
-    #
+def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, excluded_freq = None, mode_range=None, debug=None):
+    """ #Pierre# added a extra argument new_filename that specifies the name of the file to be written. In the case when the 
+    input file is given with its path, you can't write the new file name as the input + suffix
+    
+        #Pierre# other argument : excluded_freq = number of frequencies that should be zero, depends on the ASR used in dynmat
+    """
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
     masses     = qe_dyn.qe_input.get_masses()
@@ -147,7 +146,8 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
     folder=folder+str(T)+"K"
     #
     if mode_range == None:
-        mode_range=range(0, qe_dyn.nmodes) 
+        mode_range=range(excluded_freq, qe_dyn.nmodes) # Exclude the first frequencies that should be zero with 
+                                                       # zero with ASR (3 translations + up to 3 rotations)
  
     qe_new=copy.deepcopy(qe_dyn.qe_input)
 
@@ -167,11 +167,8 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
        # see Eq. 12 of arXiv:1512.06377v1
        #
        w_au = qe_dyn.get_phonon_freq(0,im+1,unit='Ha')
-       if w_au > freq_thr:
-           q_0  = 1.0/math.sqrt(2.0*w_au)
-           q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
-       else:
-           continue
+       q_0  = 1.0/math.sqrt(2.0*w_au)
+       q_T  = q_0*math.sqrt(1.0+2.0*bose(w_au,T/au2kelvin))
        #
        if debug:
           print("W and T atomic units : %14.10f, %14.10f " % (w_au,T/au2kelvin))
@@ -188,7 +185,7 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
            e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
            new_atoms[a][:]=new_atoms[a][:]+e.real*delta/math.sqrt(amu2au) #/np.sqrt(masses[a]*amu2au)
         
-       qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("'")+"_ZG"
+       qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("\"")+"_ZG"
        qe_new.control['prefix']="'"+qe_new.control['prefix']+"'"
 
        if not debug:
