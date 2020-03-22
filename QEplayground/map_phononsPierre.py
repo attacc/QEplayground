@@ -37,17 +37,16 @@ class map_phonons():
         #
         qe_in = self.qe_input
         qe_in_s = self.qe_s
-        old_atoms = qe_in.get_atoms()
+        #old_atoms = qe_in.get_atoms()
         old_natoms = int(qe_in.system["nat"])
-        new_atoms = qe_in_s.get_atoms()
+        new_atoms = qe_in_s.get_atoms(units="alat")
         new_natoms = int(qe_in_s.system["nat"])
         translation_vectors = np.zeros((new_natoms), dtype = list)
 
         for a in range(new_natoms) :
-            translation_vectors[a] = np.array(new_atoms[a]) - np.array(old_atoms[a%old_natoms])
-            
+            translation_vectors[a] = np.ones(3) + np.array(new_atoms[a]) - np.array(new_atoms[a%old_natoms])
         
-        return(translation_vectors)          # arrays are not supported by other classes of QEplayground # yet !
+        return(translation_vectors)
 
     def build_mapping(self):
         #
@@ -57,18 +56,12 @@ class map_phonons():
         folded_qpoints = [np.array([0.0, 0.0, 0.0])]
         index_folded_qpoints = [0]
         ffinv = np.reciprocal(self.ff, dtype = float)
-        print(ffinv)
         ffinv = np.around(ffinv,decimals=4)
-        print(ffinv)
-        print("check if q points are bigger than",ffinv)
         for ind,q in enumerate(qpoints_all) : 
             if np.any(np.greater_equal(q,ffinv)):
                 folded_qpoints.append(q)
                 index_folded_qpoints.append(ind)
         n_qpoints = len(folded_qpoints)
-        print("Number of folded q points :",n_qpoints)
-        print("The folded q points are :",folded_qpoints)
-
         #
         # Check orthogonality 
         #
@@ -118,12 +111,12 @@ class map_phonons():
 
         eps=1e-5
         tr = self.get_translation_vectors()
-        for iq,ifolded in enumerate(index_folded_qpoints):          
-            print("translation vectors :",tr)
+        print("translation vectors :",tr)
+        for iq,ifolded in enumerate(index_folded_qpoints): 
             for a in range(new_natoms):
                 sprod=np.dot(self.qe_dyn.qpoints[ifolded][:],tr[a][:]*2.0*math.pi) # q in units of 2pi/alat, Tr in units of alat
-                print("new_coords in alat",new_atoms[a][:])
-                print("scalar product",sprod)
+                print("scalar product =",sprod)
+                print("exponential value :",np.exp(1j*sprod))
                 phases[iq,a]=np.real(np.exp(1j*sprod))
                 print(f" Phase [q= {iq}, a= {a} ] = {phases[iq,a]}\n ")
                 if iq !=0 and abs(phases[iq,a])<=eps:
