@@ -1,0 +1,8 @@
+&input
+ fildyn='bn.dynG2',
+ asr='no'
+ fileig='dynmat2.eig'
+ filout='dynmat2.out'
+ filxsf='dynmat2.axsf'
+ filmol='dynmat2.mold'
+/
