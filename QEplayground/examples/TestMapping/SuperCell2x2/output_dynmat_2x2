@@ -1,0 +1,64 @@
+
+     Program DYNMAT v.6.4.1 starts on 23Mar2020 at  9: 1:46 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 29 465901 (2017);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI & OpenMP), running on       1 processor cores
+     Number of MPI processes:                 1
+     Threads/MPI process:                     1
+
+     MPI processes distributed on     1 nodes
+
+     Reading Dynamical Matrix from file bn_s.dynG1
+     ...Force constants read
+     ...epsilon and Z* read
+     A direction for q was not specified:TO-LO splitting will be absent
+
+     Polarizability (A^3 units)
+     multiply by 0.771276 for Clausius-Mossotti correction
+        22.109132    0.000000    0.000000
+         0.000000   22.109131   -0.000000
+         0.000000   -0.000000    4.448911
+
+     IR activities are in (D/A)^2/amu units
+
+# mode   [cm-1]    [THz]      IR
+    1     49.61    1.4872    0.0018
+    2     51.05    1.5305    0.0014
+    3     51.06    1.5306    0.0014
+    4    337.59   10.1206    0.0000
+    5    337.60   10.1209    0.0000
+    6    337.61   10.1214    0.0000
+    7    555.84   16.6636    0.0000
+    8    555.84   16.6637    0.0000
+    9    555.84   16.6638    0.0000
+   10    646.58   19.3841    0.0000
+   11    646.58   19.3841    0.0000
+   12    646.59   19.3841    0.0000
+   13    825.64   24.7522    1.2669
+   14   1134.57   34.0137    0.0000
+   15   1134.58   34.0138    0.0000
+   16   1134.58   34.0138    0.0000
+   17   1227.37   36.7957    0.0000
+   18   1227.37   36.7957    0.0000
+   19   1227.37   36.7957    0.0000
+   20   1278.74   38.3358    0.0000
+   21   1278.75   38.3358    0.0000
+   22   1278.75   38.3358    0.0000
+   23   1338.17   40.1174  108.8752
+   24   1338.17   40.1174  108.8752
+
+     DYNMAT       :      0.01s CPU      0.02s WALL
+
+
+   This run was terminated on:   9: 1:46  23Mar2020            
+
+=------------------------------------------------------------------------------=
+   JOB DONE.
+=------------------------------------------------------------------------------=
