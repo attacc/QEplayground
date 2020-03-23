@@ -273,6 +273,29 @@ class Matdyn():
                     s += masses[a]*np.vdot(e,e).real
                 self.eiv[nq,n] *= 1.0/math.sqrt(s)
 
+    def rescale_with_masses(self,masses):
+        """
+        Rescale normalized displacements u^n_{ai} with masses
+        u^n_{ai} = u^n_{ai} / sqrt { M_a }
+
+        u -> displacement
+        n -> phonon mode
+        a -> atom index
+        i -> direction
+        M -> mass
+        """
+
+        masses = np.array(masses)
+
+        #divide by masses
+        if self.check_orthogonality():
+            for nq in range(self.nqpoints):
+                for n in range(self.nmodes):
+                    for a in range(self.natoms):
+                        self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/math.sqrt(masses[a])
+        else:
+            print("These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it")
+
     def check_orthogonality(self,atol=1e-3):
         """
         Check if the eigenvectors are orthogonal
@@ -324,8 +347,6 @@ class Matdyn():
                     s += ("%12.8lf "*3)%tuple(mode[a*3:(a+1)*3].real)
                     s += ("  + i ("+"%12.8lf "*3+")\n")%tuple(mode[a*3:(a+1)*3].imag)
         return(s)
-
-
 
 
     def generate_displacement(self, iq, imode, delta):

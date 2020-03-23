@@ -169,6 +169,7 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
     #
     masses=qe_dyn.qe_input.get_masses()
     qe_dyn.normalize_with_masses(masses)
+#    qe_dyn.rescale_with_masses(masses)
     #
     #
     new_atoms  = atoms.copy()
