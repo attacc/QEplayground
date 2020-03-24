@@ -1,6 +1,6 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
-from QEplayground.map_phonons import *
+from QEplayground.map_phononsPierre import *
 
 scf_filename    ="hBN.scf.in"
 dynmat_filename ="dynmat1.eig"
@@ -27,3 +27,5 @@ new_supercell_name='hBN.supercell2x1.scf.in'
 new_dynmat_name   ='dynmat_2x1.eig'
 
 my_map = map_phonons(qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name)
+
+

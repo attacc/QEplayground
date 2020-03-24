@@ -113,6 +113,14 @@ class Pwscf:
         f.write(str(self))
         f.close()
 
+    def is_it_true(self, istring):
+        # check if an element of a namelist is equivalent to .true.
+        if ('true' in istring) or ('TRUE' in istring):
+            return True
+        else:
+            return False
+
+
 
     def stringify_group(self, keyword, group):
         string='&%s\n' % keyword
