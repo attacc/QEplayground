@@ -1,6 +1,6 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
-from QEplayground.map_phonons import *
+from QEplayground.map_phononsPierre import *
 
 scf_filename    ="hBN.scf.in"
 dynmat_filename ="dynmat1.eig"
@@ -17,8 +17,16 @@ qe_input.set_run_options(pw=pw)
 #Parallel job
 qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 
+
 # Pseudo-potential directory
 qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 #qe_input.control['pseudo_dir']="'/home/elena/Research/pseudo'"
 
+ff=[2,1,1]
+new_supercell_name='hBN.supercell2x1.scf.in'
+new_dynmat_name   ='dynmat_2x1.eig'
+
 my_map = map_phonons(qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name)
+
+my_map.:
+

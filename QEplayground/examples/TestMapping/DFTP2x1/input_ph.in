@@ -1,0 +1,9 @@
+bn_phonons
+&inputph
+  tr2_ph=1.0d-14,
+  prefix='bn',
+  outdir='./',
+  fildyn='bn.dynG'
+  ldisp=.true.
+  nq1=2, nq2=1, nq3=1
+ /

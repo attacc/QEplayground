@@ -19,7 +19,20 @@ class map_phonons():
                   modulo a reciprocal lattice vector
     """
     def __init__(self,qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name):           # ff stands for folding factor
+        
+        print(" \n\n\n * * * Map phonons in a supercell * * *\n")
+        print(" This code works only without symmetries!!! \n")
+        
         self.qe_input=qe_input
+
+        if not qe_input.is_it_true(qe_input.system['noinv']):
+            self.qe_input.system['noinv']='.true.'
+            print(" WARNING! noinv flag set to .true. !!! \n")
+
+        if not qe_input.is_it_true(qe_input.system['nosym']):
+            self.qe_input.system['nosym']='.true.'
+            print(" WARNING! nosym flag set to .true. !!! \n")
+
         self.qe_dyn  =qe_dyn
         self.ff      = ff
         self.new_supercell_name = new_supercell_name
@@ -27,9 +40,7 @@ class map_phonons():
         superc=supercell(qe_input,R=ff, mode='keep_kpoints')
         self.qe_s=superc.write()
         self.qe_s.write(new_supercell_name)
-        
-        print(" \n\n\n * * * Map phonons in a supercell * * *\n")
-        print(" WARNING! This code works only without symmetries!!! nosym=.true. and noinv=.true. \n")
+
 
     def get_translation_vectors(self):
         #
