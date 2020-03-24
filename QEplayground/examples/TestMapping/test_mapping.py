@@ -2,8 +2,8 @@ from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.thermal_lines import *
 
-scf_filename    ="lih.scf.in"
-dynmat_filename ="lih.eigv"
+scf_filename    ="hBN.scf.in"
+dynmat_filename ="dynmat_all.eig"
 
 qe_input =Pwscf(scf_filename)
 qe_dyn=Matdyn(qe_input,dynmat_filename)
@@ -22,6 +22,5 @@ qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 #qe_input.control['pseudo_dir']="'/home/elena/Research/pseudo'"
 
-single_mode_thermal_line(qe_input, qe_dyn, modes=[3,4,5])
 
 
