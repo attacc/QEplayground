@@ -30,4 +30,4 @@ my_map = map_phonons(qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name)
 
 translation_vectors = my_map.get_translation_vectors()
 
-my_map.build_mapping(sort_ph=False)
+my_map.build_mapping(sort_ph=False,print_eig=False,norm_eig=True)

@@ -59,7 +59,7 @@ class map_phonons():
             
         return(translation_vectors)
 
-    def build_mapping(self,sort_ph=True):
+    def build_mapping(self,sort_ph=True,print_eig=False,norm_eig=True):
         #
         # Select all the q points to be folded
         #
@@ -128,6 +128,12 @@ class map_phonons():
         #
         n_qpoints=self.qe_dyn.nqpoints
         #
+        # Print eigenvalues and eigenvectors
+        # 
+        if(print_eig):
+            self.qe_dyn.write_modes()
+
+
         for iq in range(n_qpoints):
             for im in range(nmodes_old):
                 im_q=im+iq*nmodes_old
@@ -135,6 +141,10 @@ class map_phonons():
                 for iq2 in range(n_qpoints):
                     self.qe_dyn_s.eiv[0,im_q,iq2*nmodes_old:(iq2+1)*nmodes_old]=self.qe_dyn.eiv[iq,im,:]
         # 
+        #
+        if(print_eig):
+            self.qe_dyn_s.write_modes()
+        #
         # Add phases to the eigenvectors
         #
         tpiba=2.0*math.pi/np.linalg.norm(self.qe_input.cell_parameters[0])
@@ -142,15 +152,15 @@ class map_phonons():
         # I assume that the number of cell is equal to the number of q-points
         # this code can be generalized to map only particular q-points
         #
-#        for iq in range(n_qpoints):
-#            for im in range(nmodes_old):
-#                im_q=im+iq*nmodes_old
-#                for cell in range(n_qpoints):
-#                    # q in units of 2pi/alat, Tr in units of alat
-#                    sprod=np.dot(tr[cell][:],self.qe_dyn.qpoints[iq][:]*2.0*math.pi) 
-#                    phase=np.real(np.exp(1j*sprod))
+        for iq in range(n_qpoints):
+            for im in range(nmodes_old):
+                im_q=im+iq*nmodes_old
+                for cell in range(n_qpoints):
+                    # q in units of 2pi/alat, Tr in units of alat
+                    sprod=np.dot(tr[cell][:],self.qe_dyn.qpoints[iq][:]*2.0*math.pi) 
+                    phase=np.real(np.exp(1j*sprod))
 #                    # Add phase
-#                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
+                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
 
                     
         #new_atoms =self.qe_s.get_atoms(units="alat")
@@ -194,7 +204,12 @@ class map_phonons():
         #
         # Normalize eigenvectors again
         #
-        self.qe_dyn_s.normalize()
+        if(norm_eig):
+            self.qe_dyn_s.normalize()
+            self.qe_dyn_s.check_orthogonality()
+        else:
+            for n in range(nmodes_new):
+                print("New norm "+str(np.linalg.norm(self.qe_dyn_s.eiv[0,n])))
         #
         # Write output
         #
