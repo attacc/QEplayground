@@ -3,7 +3,7 @@ from QEplayground.matdyn import *
 from QEplayground.map_phononsPierre import *
 
 scf_filename    ="hBN.scf.in"
-dynmat_filename ="dynmat1.eig"
+dynmat_filename ="dynmat_all.eig"
 
 qe_input =Pwscf(scf_filename)
 qe_dyn=Matdyn(qe_input,dynmat_filename)
@@ -29,4 +29,5 @@ new_dynmat_name   ='dynmat_2x1.eig'
 my_map = map_phonons(qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name)
 
 translation_vectors = my_map.get_translation_vectors()
-print(str(translation_vectors))
+
+my_map.build_mapping(sort_ph=False)
