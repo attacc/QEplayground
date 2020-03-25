@@ -28,5 +28,5 @@ new_dynmat_name   ='dynmat_2x1.eig'
 
 my_map = map_phonons(qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name)
 
-my_map.:
-
+translation_vectors = my_map.get_translation_vectors()
+print(str(translation_vectors))

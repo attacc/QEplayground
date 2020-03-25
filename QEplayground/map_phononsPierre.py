@@ -46,17 +46,12 @@ class map_phonons():
         #
         # Works only for diagonal supercell a priori
         #
-        qe_in = self.qe_input
-        qe_in_s = self.qe_s
-        #old_atoms = qe_in.get_atoms()
-        old_natoms = int(qe_in.system["nat"])
-        new_atoms = qe_in_s.get_atoms(units="alat")
-        new_natoms = int(qe_in_s.system["nat"])
-        translation_vectors = np.zeros((new_natoms), dtype = list)
-
-        for a in range(new_natoms) :
-            translation_vectors[a] = np.ones(3) + np.array(new_atoms[a]) - np.array(new_atoms[a%old_natoms])
-        
+        translation_vectors=np.zeros((self.ff[0],self.ff[1],self.ff[2],3))
+        latvec             =np.array(self.qe_input.cell_parameters)
+        alat               =np.linalg.norm(self.qe_input.cell_parameters[0])
+        for nz,ny,nx in product(range(int(self.ff[2])),range(int(self.ff[1])),range(int(self.ff[0]))):
+            translation_vectors[nx,ny,nz,:]=(nx*latvec[0]+ny*latvec[1]+nz*latvec[2])/alat
+            
         return(translation_vectors)
 
     def build_mapping(self):
