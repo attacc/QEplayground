@@ -17,7 +17,6 @@ qe_input.set_run_options(pw=pw)
 #Parallel job
 qe_input.set_run_options(pw=pw, nprocs=2, npool=2)
 
-
 # Pseudo-potential directory
 qe_input.control['pseudo_dir']="'/home/attacc/SOFTWARE/PSEUDO_PWSCF'"
 #qe_input.control['pseudo_dir']="'/home/elena/Research/pseudo'"
