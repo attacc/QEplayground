@@ -158,9 +158,11 @@ class map_phonons():
                 for cell in range(n_qpoints):
                     # q in units of 2pi/alat, Tr in units of alat
                     sprod=np.dot(tr[cell][:],self.qe_dyn.qpoints[iq][:]*2.0*math.pi) 
-                    phase=np.real(np.exp(1j*sprod))
+                    phase=np.exp(1j*sprod)
 #                    # Add phase
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
+                    # Make it real
+                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] = np.real(self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old])
 
                     
         #new_atoms =self.qe_s.get_atoms(units="alat")
@@ -205,7 +207,9 @@ class map_phonons():
         # Normalize eigenvectors again
         #
         if(norm_eig):
+            print("Normalize the new eigenvectors ")
             self.qe_dyn_s.normalize()
+            print("Check normalization...")
             self.qe_dyn_s.check_orthogonality()
         else:
             for n in range(nmodes_new):
