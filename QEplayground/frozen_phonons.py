@@ -9,8 +9,7 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
-from QEplayground.units  import autime2s,amu2au,thz2cm1
-from units               import default_freq_thr
+from QEplayground.units  import autime2s,amu2au,thz2cm1,default_freq_thr
 import math
 import pathlib
 
@@ -68,7 +67,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None, freq_thr=defa
         w_au = qe_dyn.get_phonon_freq(0,im+1,unit='Ha')
         if w_au < freq_thr:
             print(" Mode %d skipped too low frequency" % im+1)
-            continue:
+            continue
          
         print(" Calculating mode %d .... " % (im+1))
         w_au = qe_dyn.eig[0,im]*(2.0*math.pi)/thz2cm1*autime2s*1e12

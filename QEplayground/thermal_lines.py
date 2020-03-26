@@ -12,10 +12,9 @@
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.pwout  import *
-from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin
+from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin,default_freq_thr
 from QEplayground.utilities import bose
 from itertools import *
-from units import default_freq_thr
 import math
 import random
 
