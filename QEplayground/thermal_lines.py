@@ -15,12 +15,13 @@ from QEplayground.pwout  import *
 from QEplayground.units  import autime2s,amu2au,thz2cm1,au2kelvin
 from QEplayground.utilities import bose
 from itertools import *
+from units import default_freq_thr
 import math
 import random
 
 
 def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
-                           n_tlines=None, freq_thr=None, tl2_lines=True,
+                           n_tlines=None, freq_thr=default_freq_thr, tl2_lines=True,
                            mode_range=None, debug=None):
     #
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
@@ -46,9 +47,6 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
         mode_range=range(qe_dyn.nmodes) # Exclude the first 3 acustic modes
 
     tl_list=[]  # Thermal lines list
-
-    if freq_thr == None:
-        freq_thr = 0.0004556  # Hartree = 100 cm-1
 
     if new_filename == None:
         new_filename = qe_dyn.qe_input.filename  # default file name
@@ -135,7 +133,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
             print(new_atoms)
 
 
-def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = None, mode_range=None, debug=None):
+def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = default_freq_thr, mode_range=None, debug=None):
     #
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
@@ -155,9 +153,6 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = N
     if mode_range == None:
         mode_range=range(0, qe_dyn.nmodes) 
  
-    if freq_thr == None:
-        freq_thr = 0.0004556   # Hartree = 100 cm-1
-
     if new_filename == None:
         new_filename = qe_dyn.qe_input.filename  # default file name
 
