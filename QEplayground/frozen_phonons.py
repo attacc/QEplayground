@@ -66,7 +66,7 @@ def frozen_phonons(qe_input, qe_dyn, delta, r_order=2, modes=None, freq_thr=defa
     for im in modes:
         w_au = qe_dyn.get_phonon_freq(0,im+1,unit='Ha')
         if w_au < freq_thr:
-            print(" Mode %d skipped too low frequency" % im+1)
+            print(f" Mode {im+1} skipped too low frequency")
             continue
          
         print(" Calculating mode %d .... " % (im+1))
