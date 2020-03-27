@@ -3,7 +3,7 @@ from QEplayground.matdyn import *
 from QEplayground.frozen_phonons import *
 
 r_order=2    # Richardson extrapolation order 
-delta=0.04  # Displacement in a.u.
+delta=0.05  # Displacement in a.u.
 
 scf_filename    ="hBN.supercell2x2.scf.in"
 dynmat_filename ="dynmat_2x2.eig"
