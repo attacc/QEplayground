@@ -1,0 +1,23 @@
+
+
+* * * Frozen phonon calculations * * *
+
+Min and max  mass :  10.81100000  -   14.00600000  [amu]
+Mode 4   fr.(THz)    25.17554764  [DFTP  24.74851736]
+Mode 4   fr.(cm^-1) 839.76588903  [DFTP 825.52169200]  DIFF    1.725% 
+Mode 5   fr.(THz)    40.60623266  [DFTP  40.11250806]
+Mode 5   fr.(cm^-1) 1354.47814506  [DFTP 1338.00926500]  DIFF    1.231% 
+Mode 6   fr.(THz)    40.56874730  [DFTP  40.11262042]
+Mode 6   fr.(cm^-1) 1353.22776814  [DFTP 1338.01301300]  DIFF    1.137% 
+Mode 7   fr.(THz)    10.26583225  [DFTP  10.12495799]
+Mode 7   fr.(cm^-1) 342.43130943  [DFTP 337.73225000]  DIFF    1.391% 
+Mode 8   fr.(THz)    17.46934188  [DFTP  16.66326586]
+Mode 8   fr.(cm^-1) 582.71453012  [DFTP 555.82672800]  DIFF    4.837% 
+Mode 9   fr.(THz)    19.38255663  [DFTP  19.38415390]
+Mode 9   fr.(cm^-1) 646.53250577  [DFTP 646.58578500]  DIFF    0.008% 
+Mode 10   fr.(THz)    34.46173386  [DFTP  34.01370702]
+Mode 10   fr.(cm^-1) 1149.51972390  [DFTP 1134.57515700]  DIFF    1.317% 
+Mode 11   fr.(THz)    37.40888603  [DFTP  36.78955436]
+Mode 11   fr.(cm^-1) 1247.82614003  [DFTP 1227.16745900]  DIFF    1.683% 
+Mode 12   fr.(THz)    38.64239000  [DFTP  38.32586043]
+Mode 12   fr.(cm^-1) 1288.97140415  [DFTP 1278.41311400]  DIFF    0.826% 

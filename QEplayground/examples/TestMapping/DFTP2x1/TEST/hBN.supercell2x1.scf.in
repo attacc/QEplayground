@@ -1,0 +1,37 @@
+&control
+         calculation = 'scf'
+        restart_mode = 'from_scratch'
+              prefix = 'bn_2x1x1'
+           verbosity = 'high'
+          pseudo_dir = '/home/attacc/SOFTWARE/PSEUDO_PWSCF'
+              outdir = './'
+          wf_collect = .true.
+/&end
+&system
+               ibrav = 0
+           celldm(1) = 4.72431525
+                 nat = 4
+                ntyp = 2
+             ecutwfc = 60.0
+               nosym = .true.
+               noinv = .true.
+/&end
+&electrons
+         mixing_mode = 'plain'
+         mixing_beta = 0.7
+            conv_thr = 1.0d-10
+/&end
+CELL_PARAMETERS { alat }
+  2.0000000000   0.0000000000   0.0000000000 
+ -0.5000000000   0.8660254038   0.0000000000 
+  0.0000000000   0.0000000000   4.2334177400 
+ATOMIC_SPECIES
+   B   10.811         B.pz-vbc.UPF
+   N   14.006         N.pz-vbc.UPF
+ATOMIC_POSITIONS { crystal }
+  B   0.3333333333   0.3333333333   0.0000000000
+  N  -0.3333333333  -0.3333333333   0.0000000000
+  B   0.8333333333   0.3333333333   0.0000000000
+  N   0.1666666667  -0.3333333333   0.0000000000
+K_POINTS { automatic }
+  5 10  1  0  0  0
