@@ -100,7 +100,7 @@ class map_phonons():
         #
         # Build the supercell
         #
-        superc=supercell(self.qe_input,R=self.ff)
+        superc=supercell(self.qe_input,R=self.ff,mode='keep_kpoints')
         self.qe_s=superc.write()
         self.qe_s.write(self.new_supercell_name)
         print("\nSupercell scf file: "+self.new_supercell_name+"\n")
