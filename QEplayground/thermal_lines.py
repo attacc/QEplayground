@@ -163,8 +163,13 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = d
     #
     masses=qe_dyn.qe_input.get_masses()
     qe_dyn.normalize_with_masses(masses)
-#    qe_dyn.rescale_with_masses(masses)
     #
+    # Fix Gauge sign of eigenvalues   
+    # see page 075125-3 of PRB 94, 075125 (2006)
+    #
+    for im in mode_range:
+        if  qe_dyn.eiv[0,im,0] < 0.0:
+            qe_dyn.eiv[0,im,:] *= -1.0
     #
     new_atoms  = atoms.copy()
     for im in mode_range:
