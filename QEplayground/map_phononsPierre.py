@@ -4,7 +4,7 @@
 # All rights reserved.
 #
 #
-from itertools import product
+from itertools import product, groupby
 from QEplayground.pwscf  import *
 from QEplayground.matdyn import *
 from QEplayground.supercell import *
@@ -73,30 +73,16 @@ class map_phonons():
         print("\n Q-points in 2 pi/alat ")
         for qpoint in qpoints_all:
             print(str(qpoint))
+        
         #
-        #folded_qpoints = [np.array([0.0, 0.0, 0.0])]
-        #index_folded_qpoints = [0]
-        #ffinv = np.reciprocal(self.ff, dtype = float)
-        #ffinv = np.around(ffinv,decimals=4)
-        #
-        #
-        ##for ind,q in enumerate(qpoints_all) : 
-        #    if np.any(np.greater_equal(q,ffinv)):
-        #        folded_qpoints.append(q)
-        #        index_folded_qpoints.append(ind)
-        #n_qpoints = len(folded_qpoints)
-        #
-
         # Check orthogonality 
         #              
-        #print(str(n_qpoints))
-        #exit(0)
         if(not self.qe_dyn.check_orthogonality()):
             print(" ERROR ERROR ERROR!! ")
             print(" Use the dynamical matrix eigenvectors as input!! ")
             print(" Not the one normalized with the masses!! ")
             sys.exit(1)
-        #
+        
         #
         # Build the supercell
         #
@@ -119,12 +105,7 @@ class map_phonons():
         #
         # Copy old eivenvalues and eigenvectors (no phase yet) (phase is exp(1j*q.T) where q is 0)
         #
-#        for iq,ifolded in enumerate(index_folded_qpoints):
-#            for im in range(nmodes_old):
-#                im_q=im+iq*nmodes_old
-#                self.qe_dyn_s.eig[0,im_q]=self.qe_dyn.eig[ifolded,im]
-#                for iq2 in range(n_qpoints):
-#                    self.qe_dyn_s.eiv[0,im_q,iq2*nmodes_old:(iq2+1)*nmodes_old]=self.qe_dyn.eiv[ifolded,im,:]
+        #
         #
         n_qpoints=self.qe_dyn.nqpoints
         #
@@ -132,13 +113,14 @@ class map_phonons():
         # 
         if(print_eig):
             self.qe_dyn.write_modes()
-
-
-        for iq in range(n_qpoints):
+        
+        N = self.ff[0]*self.ff[1]*self.ff[2]
+        
+        for iq in range(N):
             for im in range(nmodes_old):
                 im_q=im+iq*nmodes_old
                 self.qe_dyn_s.eig[0,im_q]=self.qe_dyn.eig[iq,im]
-                for iq2 in range(n_qpoints):
+                for iq2 in range(N):
                     self.qe_dyn_s.eiv[0,im_q,iq2*nmodes_old:(iq2+1)*nmodes_old]=self.qe_dyn.eiv[iq,im,:]
         # 
         #
@@ -149,49 +131,35 @@ class map_phonons():
         #
         tpiba=2.0*math.pi/np.linalg.norm(self.qe_input.cell_parameters[0])
         #
-        # I assume that the number of cell is equal to the number of q-points
-        # this code can be generalized to map only particular q-points
+        # I assume there is an unknown number of q-points
         #
-        for iq in range(n_qpoints):
+        #
+        # I order the q points in the same way than the translation vectors for simplicity reasons
+        #
+        qpoints_all_sorted = sorted(qpoints_all, key = lambda q: q[2])
+        heights = [list(el) for _,el in groupby(qpoints_all, key = lambda q: q[2])]
+        depths = []
+        for i in range(len(heights)):
+            depths.append([list(el) for _,el in groupby(heights[i], key = lambda q: q[1])])
+        q_ordered = []
+        for i in range(self.ff[2]):
+            for j in range(self.ff[1]):
+                for k in range(self.ff[0]):
+                    q_ordered.append(depths[-i][-j][-k])
+        #
+        for iq in range(N):
             for im in range(nmodes_old):
                 im_q=im+iq*nmodes_old
-                for cell in range(n_qpoints):
+                for cell in range(N):
                     # q in units of 2pi/alat, Tr in units of alat
-                    sprod=np.dot(tr[cell][:],self.qe_dyn.qpoints[iq][:]*2.0*math.pi) 
+                    sprod=np.dot(tr[cell][:],q_ordered[cell][:]*2.0*math.pi) 
                     phase=np.exp(1j*sprod)
-#                    # Add phase
+                    # Add phase
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
                     # Make it real
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] = np.real(self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old])
 
                     
-        #new_atoms =self.qe_s.get_atoms(units="alat")
-        #new_natoms=int(self.qe_s.system["nat"])
-        #
-        #
-        #
-        #phases=np.zeros([n_qpoints,new_natoms],dtype=float)
-        #
-        #
-        #eps=1e-5
-        #tr = self.get_translation_vectors()
-        #print("translation vectors :",tr)
-        #for iq,ifolded in enumerate(index_folded_qpoints): 
-        #    for a in range(new_natoms):
-        #        sprod=np.dot(self.qe_dyn.qpoints[ifolded][:],tr[a][:]*2.0*math.pi) # q in units of 2pi/alat, Tr in units of alat
-        #        print("scalar product =",sprod)
-        #        print("exponential value :",np.exp(1j*sprod))
-        #        phases[iq,a]=np.real(np.exp(1j*sprod))
-        #        print(f" Phase [q= {iq}, a= {a} ] = {phases[iq,a]}\n ")
-        #        if iq !=0 and abs(phases[iq,a])<=eps:
-        #            print("Zero phase for atom %d at q= %iq ! Please check the code! ")
-        #            sys.exit(1)
-        #
-        #for im in range(nmodes_old):
-        #     for iq in range(n_qpoints):
-        #         im_q=im+iq*nmodes_old
-        #         for a in range(new_natoms):
-        #             self.qe_dyn_s.eiv[0,im_q,a*3:(a+1)*3] *= phases[iq,a]
         #
         if(sort_ph):
             #
