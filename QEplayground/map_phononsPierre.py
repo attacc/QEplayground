@@ -103,37 +103,9 @@ class map_phonons():
         self.qe_dyn_s.eig     =np.zeros([1,nmodes_new])
         self.qe_dyn_s.eiv     =np.zeros([1,nmodes_new,nmodes_new],dtype=complex)
         #
-        # Copy old eivenvalues and eigenvectors (no phase yet) (phase is exp(1j*q.T) where q is 0)
-        #
-        #
-        #
-        n_qpoints=self.qe_dyn.nqpoints
-        #
-        # Print eigenvalues and eigenvectors
-        # 
-        if(print_eig):
-            self.qe_dyn.write_modes()
-        
-        N = self.ff[0]*self.ff[1]*self.ff[2]
-        
-        for iq in range(N):
-            for im in range(nmodes_old):
-                im_q=im+iq*nmodes_old
-                self.qe_dyn_s.eig[0,im_q]=self.qe_dyn.eig[iq,im]
-                for iq2 in range(N):
-                    self.qe_dyn_s.eiv[0,im_q,iq2*nmodes_old:(iq2+1)*nmodes_old]=self.qe_dyn.eiv[iq,im,:]
-        # 
-        #
-        if(print_eig):
-            self.qe_dyn_s.write_modes()
-        #
-        # Add phases to the eigenvectors
-        #
-        tpiba=2.0*math.pi/np.linalg.norm(self.qe_input.cell_parameters[0])
+        # Selecting q-points
         #
         # I assume there is an unknown number of q-points
-        #
-        #
         # I order the q points in the same way than the translation vectors for simplicity reasons
         #
         qpoints_all_sorted = sorted(qpoints_all, key = lambda q: q[2])
@@ -147,13 +119,48 @@ class map_phonons():
                 for k in range(self.ff[0]):
                     q_ordered.append(depths[-i][-j][-k])
         #
-        for iq in range(N):
+        print("Selected q-points")
+        for el in q_ordered:
+            print(el)
+
+        #
+        # Copy old eivenvalues and eigenvectors (no phase yet) (phase is exp(1j*q.T) where q is 0)
+        #
+        #
+        #
+        n_qpoints=self.qe_dyn.nqpoints
+        #
+        # Print eigenvalues and eigenvectors
+        # 
+        if(print_eig):
+            self.qe_dyn.write_modes()
+        
+        N = self.ff[0]*self.ff[1]*self.ff[2]
+        
+        for iq in range(len(q_ordered)):
             for im in range(nmodes_old):
                 im_q=im+iq*nmodes_old
-                for cell in range(N):
+                self.qe_dyn_s.eig[0,im_q]=self.qe_dyn.eig[iq,im]
+                for iq2 in range(len(q_ordered)):
+                    self.qe_dyn_s.eiv[0,im_q,iq2*nmodes_old:(iq2+1)*nmodes_old]=self.qe_dyn.eiv[iq,im,:]
+        # 
+        #
+        if(print_eig):
+            self.qe_dyn_s.write_modes()
+        #
+        # Add phases to the eigenvectors
+        #
+        tpiba=2.0*math.pi/np.linalg.norm(self.qe_input.cell_parameters[0])
+        #
+        #
+        for iq in range(len(q_ordered)):
+            for im in range(nmodes_old):
+                im_q=im+iq*nmodes_old
+                for cell in range(len(q_ordered)):
                     # q in units of 2pi/alat, Tr in units of alat
-                    sprod=np.dot(tr[cell][:],q_ordered[cell][:]*2.0*math.pi) 
+                    sprod=np.dot(tr[cell][:],q_ordered[iq][:]*2.0*math.pi) 
                     phase=np.exp(1j*sprod)
+                    #print("q ",q_ordered[iq][:]," scalar  Tr",tr[cell][:],"phase  :",phase)
                     # Add phase
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
                     # Make it real
@@ -178,7 +185,7 @@ class map_phonons():
             print("Normalize the new eigenvectors ")
             self.qe_dyn_s.normalize()
             print("Check normalization...")
-            self.qe_dyn_s.check_orthogonality()
+            print("Are the new eigenvectors orthogonal ?",self.qe_dyn_s.check_orthogonality())
         else:
             for n in range(nmodes_new):
                 print("New norm "+str(np.linalg.norm(self.qe_dyn_s.eiv[0,n])))
