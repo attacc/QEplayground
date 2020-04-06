@@ -153,19 +153,21 @@ class map_phonons():
         tpiba=2.0*math.pi/np.linalg.norm(self.qe_input.cell_parameters[0])
         #
         #
+        phases = np.zeros((len(q_ordered),len(tr)),dtype=complex)
+        #
         for iq in range(len(q_ordered)):
-            for im in range(nmodes_old):
-                im_q=im+iq*nmodes_old
-                for cell in range(len(q_ordered)):
-                    # q in units of 2pi/alat, Tr in units of alat
-                    sprod=np.dot(tr[cell][:],q_ordered[iq][:]*2.0*math.pi) 
-                    phase=np.exp(1j*sprod)
-                    #print("q ",q_ordered[iq][:]," scalar  Tr",tr[cell][:],"phase  :",phase)
-                    # Add phase
-                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
-                    # Make it real
-                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] = np.real(self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old])
-
+            for cell in range(len(tr)):
+                sprod = np.dot(q_ordered[iq][:],tr[cell][:]*2.*math.pi)
+                phases[iq,cell] = np.exp(1j*sprod)
+        #
+        natoms = int(nmodes_old / 3.)     # number of atoms per unit cell
+        # 
+        for im in range(nmodes_new):
+            for cell in range(len(tr)):
+                # Add phase
+                self.qe_dyn_s.eiv[0,im,cell*natoms:(cell+1)*natoms] *= phases[im//nmodes_old,cell]
+                # Make it real
+                self.qe_dyn_s.eiv[0,im,cell*natoms:(cell+1)*natoms] = np.real(self.qe_dyn_s.eiv[0,im,cell*natoms:(cell+1)*natoms])
                     
         #
         if(sort_ph):
