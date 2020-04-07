@@ -36,7 +36,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     # 
     if not qe_dyn.check_orthogonality():
         print("Error phonon eigenvectors not orthogonal!!! ")
-        exit(0)
+        #exit(0)
     #
     # Folder name with temperature
     #

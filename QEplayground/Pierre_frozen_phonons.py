@@ -20,10 +20,18 @@ def input_files_frozen_phonons(qe_input, qe_dyn, delta, r_order=2, queue=6, nb_c
         print(" ERROR ERROR ERROR!! ")
         print(" Use the dynamical matrix eigenvectors as input!! ")
         print(" Not the one normalized with the masses!! ")
-        sys.exit(1)
+        #sys.exit(1)
 
     masses=qe_input.get_masses()
     qe_dyn.normalize_with_masses(masses)
+    
+    # manual override of the non-orthogonality
+    _natoms = int(qe_input.system['nat'])
+    _nmodes = 3*_natoms
+    for nq in range(qe_dyn.nqpoints):
+                for n in range(_nmodes):
+                    for a in range(_natoms):
+                        qe_dyn.eiv[nq,n,a*3:(a+1)*3] *= 1.0/math.sqrt(masses[a])
 
     scf_filename = "scf.in"
 
@@ -54,7 +62,7 @@ def input_files_frozen_phonons(qe_input, qe_dyn, delta, r_order=2, queue=6, nb_c
                 qe_right = qe_dyn.generate_displacement(0,im,delta)
                 folder = f"RIGHT_{im+1}"
                 qe_right.write(scf_filename, folder = folder)
-                job.write(f"mpirun -np $NSLOTS pw.x < {folder}/{scf_filename} > output_r_{im+1}\n")
+                job.write(f"mpirun -np $NSLOTS pw.x -inp {Folder}/{scf_filename} > output_r_{im+1}\n")
                 print(f"File written in {folder}")
                 #
                 #
@@ -64,7 +72,7 @@ def input_files_frozen_phonons(qe_input, qe_dyn, delta, r_order=2, queue=6, nb_c
                 qe_left =qe_dyn.generate_displacement(0, im, -delta)
                 folder=f"LEFT_{im+1}"
                 qe_left.write(scf_filename, folder = folder)
-                job.write(f"mpirun -np $NSLOTS pw.x < {folder}/{scf_filename} > output_l_{im+1}\n")
+                job.write(f"mpirun -np $NSLOTS pw.x -inp {folder}/{scf_filename} > output_l_{im+1}\n")
                 print(f"File written in {folder}")
                 #
                 #
@@ -81,7 +89,7 @@ def input_files_frozen_phonons(qe_input, qe_dyn, delta, r_order=2, queue=6, nb_c
                     qe_left =qe_dyn.generate_displacement(0, im, -delta/2.0)
                     folder=f"LEFT_bis_{im+1}"
                     qe_left.write(scf_filename,folder)
-                    job.write(f"mpirun -np $NSLOTS pw.x < {folder}/{scf_filename} > output_lb_{im+1}\n")
+                    job.write(f"mpirun -np $NSLOTS pw.x -inp {folder}/{scf_filename} > output_lb_{im+1}\n")
                     print(f"File written in {folder}")
                     #
                     #
