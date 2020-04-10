@@ -117,6 +117,8 @@ class Pwscf:
 
     def is_it_true(self, istring):
         # check if an element of a namelist is equivalent to .true.
+        if istring is None:
+            return False
         if ('true' in istring) or ('TRUE' in istring):
             return True
         else:
