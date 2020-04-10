@@ -94,7 +94,9 @@ class Pwscf:
         self.system['occupations']  = None
         self.system['degauss']      = None
         self.system['nosym']        = None
-        self.system['noinv']        = None
+        self.system['noinv']           = None
+        self.system['assume_isolated'] = None
+
 
         self.electrons['mixing_mode']     = None
         self.electrons['mixing_beta']     = None
