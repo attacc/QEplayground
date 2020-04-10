@@ -209,8 +209,12 @@ class map_phonons():
         if(norm_eig):
             print("Normalize the new eigenvectors ")
             self.qe_dyn_s.normalize()
-            print("Check normalization...")
-            self.qe_dyn_s.check_orthogonality()
+            print("Check normalization...",end="  ")
+            if(not self.qe_dyn_s.check_orthogonality()):
+                print("NO")
+                exit(0)
+            else:
+                print("YES")
         else:
             for n in range(nmodes_new):
                 print("New norm "+str(np.linalg.norm(self.qe_dyn_s.eiv[0,n])))
