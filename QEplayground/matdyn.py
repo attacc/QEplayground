@@ -126,7 +126,7 @@ class Matdyn():
                 for a in range(self.natoms):
                     xr,yr,zr = mode[a*3:(a+1)*3].real
                     xi,yi,zi = mode[a*3:(a+1)*3].imag
-                    s += ("( "+"%12.6lf "*6+')\n')%(xr,xi,yr,yi,zr,zi)
+                    s += ("( "+"%18.14lf "*6+')\n')%(xr,xi,yr,yi,zr,zi)
             s += "*"*81+"\n"
 
         if filename:
@@ -310,6 +310,11 @@ class Matdyn():
                     e2 = self.eiv[nq,m]
                     orth[n,m] = np.vdot(e1,e2).real
             orth_check=orth_check and np.allclose(orth,np.eye(self.nmodes),atol=atol)
+
+        if orth_check == False:
+            for n in range(self.nmodes):
+                for m in range(self.nmodes):
+                    print(f" Modex {n} x {m} = {orth[n,m]}")
         return(orth_check)
 
     def check_normalization(self,masses,atol=1e-5):
