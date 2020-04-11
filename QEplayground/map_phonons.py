@@ -19,10 +19,10 @@ class map_phonons():
                   modulo a reciprocal lattice vector
     """
     def __init__(self,qe_input, qe_dyn, ff, new_supercell_name, new_dynmat_name):           # ff stands for folding factor
-        
+
         print(" \n\n\n * * * Map phonons in a supercell * * *\n")
         print(" This code works only without symmetries!!! \n")
-        
+ 
         self.qe_input=qe_input
 
         if not qe_input.is_it_true(qe_input.system['noinv']):
@@ -161,8 +161,6 @@ class map_phonons():
                     phase=np.exp(1j*sprod)
 #                    # Add phase
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
-                    # Make it real
-                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] = np.real(self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old])
 
                     
         #new_atoms =self.qe_s.get_atoms(units="alat")
@@ -219,6 +217,13 @@ class map_phonons():
             for n in range(nmodes_new):
                 print("New norm "+str(np.linalg.norm(self.qe_dyn_s.eiv[0,n])))
         #
+        print("Make eigenvectors real this break orthogonality!! ")
+        for iq in range(n_qpoints):
+            for im in range(nmodes_old):
+                im_q=im+iq*nmodes_old
+                for cell in range(n_qpoints):
+                    # Make it real
+                    self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] = np.real(self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old])
         # Write output
         #
         self.qe_dyn_s.write_modes(filename=self.new_dynmat_name)
