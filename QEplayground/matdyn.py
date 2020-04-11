@@ -313,8 +313,10 @@ class Matdyn():
 
         if orth_check == False:
             for n in range(self.nmodes):
+                e1=self.get_phonon_freq(0,n+1,unit='cm-1')
                 for m in range(self.nmodes):
-                    print(" Modex %d x %d = %12.6f" % (n,m,orth[n,m]))
+                    e2=self.get_phonon_freq(0,m+1,unit='cm-1')
+                    print(" Modex %d x %d = %12.6f  Energy %12.8f  %12.8f" % (n,m,orth[n,m],e1,e2))
         return(orth_check)
 
     def check_normalization(self,masses,atol=1e-5):

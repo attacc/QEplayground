@@ -224,6 +224,8 @@ class map_phonons():
                 for cell in range(n_qpoints):
                     # Make it real
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] = np.real(self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old])
+        self.qe_dyn_s.normalize()
         # Write output
+        self.qe_dyn_s.check_orthogonality()
         #
         self.qe_dyn_s.write_modes(filename=self.new_dynmat_name)
