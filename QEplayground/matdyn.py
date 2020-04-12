@@ -240,7 +240,7 @@ class Matdyn():
             for n in range(self.nmodes):
                 self.eiv[nq,n] /= np.linalg.norm(self.eiv[nq,n])
 
-    def normalize_with_masses(self,masses):
+    def normalize_with_masses(self,masses,skip_ortho_check=False):
         """
         Normalize the displacements u^n_{ai} according to:
         sum_{ai} M_a u^n_{ai} u^m_{ai} = delta_{nm}
@@ -254,14 +254,16 @@ class Matdyn():
 
         masses = np.array(masses)
 
+        #check orthogonality
+        if not skip_ortho_check:
+            if not self.check_orthogonality():
+                print("These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it")
+
         #divide by masses
-        if self.check_orthogonality():
-            for nq in range(self.nqpoints):
-                for n in range(self.nmodes):
-                    for a in range(self.natoms):
-                        self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/math.sqrt(masses[a])
-        else:
-            print("These eigenvectors are non-orthogonal, probably they are already scaled by the masses so I won't do it")
+        for nq in range(self.nqpoints):
+            for n in range(self.nmodes):
+                for a in range(self.natoms):
+                    self.eiv[nq,n,a*3:(a+1)*3] *= 1.0/math.sqrt(masses[a])
 
         #enforce delta_nm
         for nq in range(self.nqpoints):

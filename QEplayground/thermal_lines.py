@@ -21,7 +21,7 @@ import random
 
 def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
                            n_tlines=None, freq_thr=default_freq_thr, tl2_lines=True,
-                           mode_range=None, debug=None):
+                           mode_range=None, debug=None,skip_ortho_check=False):
     #
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
@@ -34,9 +34,12 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     #
     # Check orthogonality of the phonon eigenvectors
     # 
-    if not qe_dyn.check_orthogonality():
-        print("Error phonon eigenvectors not orthogonal!!! ")
-        exit(0)
+    if not skip_ortho_check:
+        if not qe_dyn.check_orthogonality():
+            print("Error phonon eigenvectors not orthogonal!!! ")
+            exit(0)
+    else:
+            print("Orthogonality is not checked!!! ")
     #
     # Folder name with temperature
     #
@@ -89,7 +92,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
     # Normalize with masses
     #
     masses=qe_dyn.qe_input.get_masses()
-    qe_dyn.normalize_with_masses(masses)
+    qe_dyn.normalize_with_masses(masses,skip_ortho_check)
     #
     #
     for tl_line in tl_list:   
@@ -162,7 +165,7 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = d
     # Normalize with masses
     #
     masses=qe_dyn.qe_input.get_masses()
-    qe_dyn.normalize_with_masses(masses)
+    qe_dyn.normalize_with_masses(masses,skip_ortho_check)
     #
     # Fix Gauge sign of eigenvalues   
     # see page 075125-3 of PRB 94, 075125 (2006)

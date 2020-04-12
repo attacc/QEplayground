@@ -26,11 +26,11 @@ class map_phonons():
         self.qe_input=qe_input
 
         if not qe_input.is_it_true(qe_input.system['noinv']):
-            self.qe_input.system['noinv']='.true.'
+            #self.qe_input.system['noinv']='.true.'
             print(" WARNING! noinv flag set to .true. !!! \n")
 
         if not qe_input.is_it_true(qe_input.system['nosym']):
-            self.qe_input.system['nosym']='.true.'
+            #self.qe_input.system['nosym']='.true.'
             print(" WARNING! nosym flag set to .true. !!! \n")
 
         self.qe_dyn  =qe_dyn
