@@ -246,7 +246,10 @@ class Pwscf:
         for line in self.file_lines:
             if "="  not in line:
                 continue
-            key, value=line.split("=")
+            try:
+                key, value=line.split("=")
+            except:
+                print("Error reading line : \""+line.strip()+"\"")
             for keyword in group:
                 if key.strip().lower() == keyword:
                     group[keyword] = value.strip().strip(',')
