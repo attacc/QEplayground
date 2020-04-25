@@ -160,6 +160,9 @@ class map_phonons():
                     sprod=np.dot(tr[cell][:],self.qe_dyn.qpoints[iq][:]*2.0*math.pi) 
                     phase=np.exp(1j*sprod)
 #                    # Add phase
+                    if abs(phase) < 1e-5:
+                        print("Error phase is zero!!! ")
+                        exit(0)
                     self.qe_dyn_s.eiv[0,im_q,cell*nmodes_old:(cell+1)*nmodes_old] *= phase
 
                     

@@ -190,7 +190,7 @@ class supercell():
         qe_s = copy.deepcopy(qe)
         qe_s.system['nat'] = self.old_nat*self.sup_size
         qe_s.atoms = self.atoms_input(self.new_atoms)
-        qe_s.control['prefix'] = qe.control['prefix'][:-1] #+f"_{R[0]}x{R[1]}x{R[2]}'"
+        qe_s.control['prefix'] = qe.control['prefix'][:-1]+f"_{R[0]}x{R[1]}x{R[2]}'"
         qe_s.system['ibrav']=0
         if qe.system['celldm(1)'] != None:
             #
