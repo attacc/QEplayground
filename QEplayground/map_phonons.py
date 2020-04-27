@@ -37,7 +37,7 @@ class map_phonons():
         self.ff      = ff
         self.new_supercell_name = new_supercell_name
         self.new_dynmat_name = new_dynmat_name
-        superc=supercell(qe_input,R=ff, mode='keep_kpoints')
+        superc=supercell(qe_input,R=ff, mode='diagonal')
         self.qe_s=superc.write()
         self.qe_s.write(new_supercell_name)
 
