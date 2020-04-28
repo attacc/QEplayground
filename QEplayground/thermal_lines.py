@@ -199,27 +199,27 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = d
        else:
            continue
        #
-       if debug:
-          print("W and T atomic units : %14.10f, %14.10f " % (w_au,T/au2kelvin))
-          print("W in cm-1 %14.10f " % qe_dyn.get_phonon_freq(0,im+1,unit='cm-1'))
-          print("Amplitude at T=0     : %14.10f " % q_0)
-          print("Amplitude at finite T: %14.10f " % q_T)
+       print("W and T atomic units : %14.10f, %14.10f " % (w_au,T/au2kelvin))
+       print("W in cm-1 %14.10f " % qe_dyn.get_phonon_freq(0,im+1,unit='cm-1'))
+       print("Amplitude at T=0     : %14.10f " % q_0)
+       print("Amplitude at finite T: %14.10f " % q_T)
        #
        if (im % 2 ) ==0:
            delta =  isign*q_T
        else:
            delta = -isign*q_T
 
+
        for a in range(qe_dyn.natoms):
            e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
            new_atoms[a][:]=new_atoms[a][:]+e.real*delta/math.sqrt(amu2au) #/np.sqrt(masses[a]*amu2au)
         
-       qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("'")+"_ZG"
-       qe_new.control['prefix']="'"+qe_new.control['prefix']+"'"
+    qe_new.control['prefix']=qe_dyn.qe_input.control['prefix'].strip("'")+"_ZG"
+    qe_new.control['prefix']="'"+qe_new.control['prefix']+"'"
 
-       if not debug:
-          qe_new.set_atoms(new_atoms,units="bohr")
-          qe_new.write(str(new_filename)+"_ZG",folder)
-       else:
-          print("ZG line: ")
-          print(new_atoms)
+    if not debug:
+        qe_new.set_atoms(new_atoms,units="bohr")
+        qe_new.write(str(new_filename)+"_ZG",folder)
+    else:
+        print("ZG line: ")
+        print(new_atoms)
