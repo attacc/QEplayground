@@ -135,7 +135,8 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
             print(new_atoms)
 
 
-def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = default_freq_thr, mode_range=None, debug=None,skip_ortho_check=True):
+def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = default_freq_thr, mode_range=None, debug=None,skip_ortho_check=True,
+        minus_sign=False):
     #
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
@@ -177,6 +178,13 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = d
         if  qe_dyn.eiv[0,im,0] < 0.0:
             qe_dyn.eiv[0,im,:] *= -1.0
     #
+    # Generate the opposite sign configuration
+    #
+    if minus_sign == True:
+        isign=-1.0
+    else:
+        isign=1.0
+    #
     new_atoms  = atoms.copy()
     for im in mode_range:
        #
@@ -198,9 +206,9 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = d
           print("Amplitude at finite T: %14.10f " % q_T)
        #
        if (im % 2 ) ==0:
-           delta =q_T
+           delta =  isign*q_T
        else:
-           delta =-q_T
+           delta = -isign*q_T
 
        for a in range(qe_dyn.natoms):
            e = qe_dyn.eiv[0,im,a*3:(a+1)*3]
