@@ -135,7 +135,7 @@ def generate_thermal_lines(qe_dyn, T=0.0, folder="TL", new_filename=None,
             print(new_atoms)
 
 
-def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = default_freq_thr, mode_range=None, debug=None):
+def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = default_freq_thr, mode_range=None, debug=None,skip_ortho_check=True):
     #
     atoms      = qe_dyn.qe_input.get_atoms("bohr")
     new_atoms  = np.empty((qe_dyn.natoms,3),dtype=float)
@@ -144,9 +144,12 @@ def generate_ZG_conf(qe_dyn, T=0.0, folder="ZG", new_filename=None, freq_thr = d
     #
     # Check ortogonaly of the phonon eigenvectors
     # 
-    if not qe_dyn.check_orthogonality():
-        print("Error phonon eigenvectors not orthogonal!!! ")
-        exit(0)
+    if not skip_ortho_check:
+        if not qe_dyn.check_orthogonality():
+            print("Error phonon eigenvectors not orthogonal!!! ")
+            exit(0)
+    else:
+            print("Orthogonality is not checked!!! ")
     #
     # Folder name with temperature
     #
