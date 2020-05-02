@@ -48,7 +48,7 @@ class map_phonons():
         #
         translation_vectors=np.zeros((self.ff[0]*self.ff[1]*self.ff[2],3))
         latvec             =np.array(self.qe_input.cell_parameters)
-        alat               =np.linalg.norm(self.qe_input.cell_parameters[0])
+        alat               =float(self.qe_input.system['celldm(1)'])
         #
         # Notice that I generate translation in the same order of the supercell.py
         # code
